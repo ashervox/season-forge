@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d0907">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="D3 S39 Guide">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<title>Diablo 3 — Season 39 Master Guide</title>
+<style>
+  :root{
+    --bg:#0d0907; --panel:#1a1310; --panel2:#241a14; --line:#3a2a1e;
+    --gold:#c9a24b; --gold2:#e8c878; --red:#b0301f; --red2:#e0492f;
+    --txt:#e8ddca; --muted:#9c8b72; --green:#5a8f4a; --blue:#5a7fb0;
+    --tint:#2a1a10; --leg:#d2762b; --setc:#6fbf4a;
+  }
+  :root{transition:--gold .4s}
+  html{transition:background .4s}
+  *{box-sizing:border-box}
+  /* embers */
+  #embers{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .ember{position:absolute;bottom:-12px;width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:0;filter:blur(.5px);animation:rise linear infinite}
+  @keyframes rise{0%{opacity:0;transform:translateY(0) scale(.6)}10%{opacity:.55}90%{opacity:.3}100%{opacity:0;transform:translateY(-104vh) scale(1)}}
+  .leg{color:var(--leg);font-weight:600}
+  .setc{color:var(--setc);font-weight:600}
+  @keyframes flashglow{0%{box-shadow:0 0 0 0 rgba(232,200,120,0)}25%{box-shadow:0 0 22px 3px var(--gold2);border-color:var(--gold2)}100%{box-shadow:0 0 0 0 rgba(232,200,120,0)}}
+  .task.flash{animation:flashglow .9s ease}
+  body{margin:0;font-family:"Trebuchet MS",Segoe UI,sans-serif;background:var(--bg);color:var(--txt);position:relative;
+    background-image:radial-gradient(circle at 50% -10%, var(--tint) 0%, var(--bg) 55%);min-height:100vh;transition:background-image .4s;}
+  .wrap,header,.tabs{position:relative;z-index:1}
+  header{text-align:center;padding:26px 16px 12px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(40,24,12,.6),transparent)}
+  header h1{margin:0;font-size:28px;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);text-shadow:0 0 18px rgba(201,162,75,.45);font-weight:700}
+  header p{margin:6px 0 0;color:var(--muted);font-size:13px;letter-spacing:1px}
+  .tabs{display:flex;justify-content:center;gap:10px;margin:16px auto 0;flex-wrap:wrap;max-width:900px;padding:0 12px}
+  .tab{cursor:pointer;padding:11px 22px;border:1px solid var(--line);border-radius:6px 6px 0 0;background:var(--panel);color:var(--muted);font-size:14px;letter-spacing:1px;text-transform:uppercase;transition:.18s;border-bottom:none}
+  .tab:hover{color:var(--gold)}
+  .tab.active{background:var(--panel2);color:var(--gold2);box-shadow:0 -3px 14px rgba(201,162,75,.18) inset}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+  .view{display:none}.view.active{display:block;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .pickers{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .pickers label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+  .bigsel{background:#120c08;border:1px solid var(--gold);color:var(--gold2);padding:10px 14px;border-radius:6px;font-size:15px;cursor:pointer;font-family:inherit;min-width:210px}
+  .chiprow{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{background:#120c08;border:1px solid var(--line);color:var(--muted);padding:8px 13px;border-radius:6px;font-size:13px;cursor:pointer;font-family:inherit;transition:.15s}
+  .chip:hover{color:var(--gold);border-color:var(--gold)}
+  .chip.active{background:var(--gold);color:#1a1006;border-color:var(--gold);font-weight:700}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:780px){.grid{grid-template-columns:1fr}.bigsel{min-width:160px}}
+  .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:10px;padding:18px 20px;box-shadow:0 6px 22px rgba(0,0,0,.4)}
+  .card h2{margin:0 0 14px;font-size:15px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--line);padding-bottom:9px;display:flex;align-items:center;gap:8px}
+  .stat-row{display:flex;justify-content:space-between;padding:5px 0;font-size:14px;border-bottom:1px dashed rgba(58,42,30,.5)}
+  .stat-row span:last-child{color:var(--gold2);font-weight:600;text-align:right}
+  .gear{margin:0;padding:0}
+  .gear li{list-style:none;padding:6px 0 6px 18px;position:relative;font-size:14px;border-bottom:1px dashed rgba(58,42,30,.45)}
+  .gear li:before{content:"◆";position:absolute;left:0;color:var(--gold);font-size:10px;top:9px}
+  .gear .slot{color:var(--muted);font-size:12px}
+  .progwrap{margin:6px 0 18px}
+  .progbar{height:14px;background:#1a1009;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .progfill{height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold));transition:width .4s;box-shadow:0 0 12px rgba(201,162,75,.5)}
+  .progtxt{font-size:12px;color:var(--muted);margin-top:5px;letter-spacing:1px}
+  .task{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:8px;margin-bottom:9px;background:var(--panel);cursor:pointer;transition:.15s}
+  .task:hover{border-color:var(--gold);background:var(--panel2)}
+  .task.done{opacity:.55}.task.done .ttitle{text-decoration:line-through;color:var(--muted)}
+  .chk{width:22px;height:22px;border:2px solid var(--gold);border-radius:5px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#0d0907;transition:.15s}
+  .task.done .chk{background:var(--gold)}.task.done .chk:after{content:"✓"}
+  .ttitle{font-size:14.5px;color:var(--txt);font-weight:600}
+  .tdesc{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.45}
+  .pill{display:inline-block;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:middle}
+  .pill.prio{background:rgba(176,48,31,.25);color:var(--red2);border:1px solid var(--red)}
+  .pill.med{background:rgba(90,127,176,.2);color:var(--blue);border:1px solid var(--blue)}
+  .pill.free{background:rgba(90,143,74,.22);color:#8fce7a;border:1px solid var(--green)}
+  .full{grid-column:1/-1}
+  .sub{color:var(--gold);font-weight:600;font-size:13px;margin:12px 0 6px;letter-spacing:.5px}.sub:first-child{margin-top:0}
+  .buildsel{background:#120c08;border:1px solid var(--gold);color:var(--gold2);padding:6px 10px;border-radius:6px;font-size:13px;margin-left:auto;cursor:pointer;font-family:inherit}
+  .howbox{background:rgba(201,162,75,.08);border-left:3px solid var(--gold);padding:9px 13px;border-radius:0 6px 6px 0;margin:0 0 14px;font-size:13px;line-height:1.6;color:var(--txt)}.howbox:empty{display:none}
+  .setline{font-size:12.5px;color:var(--muted);margin:-6px 0 12px}.setline b{color:var(--gold2)}
+  .reward{font-size:11px;color:var(--gold2);font-weight:400;margin-left:auto;letter-spacing:.2px;text-transform:none}
+  .tiercard.milestone{border-color:var(--gold);box-shadow:0 0 16px rgba(180,160,120,.14)}
+  .tierprog{font-size:11px;color:var(--muted);margin:-6px 0 8px;letter-spacing:1px}
+  .obj{display:flex;gap:9px;align-items:flex-start;padding:6px 2px;cursor:pointer;font-size:13px;border-bottom:1px dashed var(--line)}.obj:last-child{border-bottom:none}
+  .obj:hover .ck{border-color:var(--gold2)}
+  .ck{width:17px;height:17px;border:2px solid var(--gold);border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#0a0a0a;transition:.12s}
+  .obj.done .ck{background:var(--gold)}.obj.done .ck:after{content:"✓"}.obj.done span{text-decoration:line-through;color:var(--muted)}
+  .btn{background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;letter-spacing:1px;transition:.15s}
+  .btn:hover{color:var(--gold);border-color:var(--gold)}
+  .calc{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+  .calc label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px;letter-spacing:1px}
+  .calc input,.calc select{background:#120c08;border:1px solid var(--line);color:var(--gold2);padding:9px 11px;border-radius:6px;font-size:14px;width:150px}
+  .calcout{margin-top:14px;font-size:14px;line-height:1.7}.calcout b{color:var(--gold2);font-size:17px}
+  .cdropt{display:block;font-size:12.5px;color:var(--txt);padding:4px 0;cursor:pointer}.cdropt input{margin-right:7px;accent-color:var(--gold)}
+  textarea{font-family:monospace}
+  footer{text-align:center;color:#5c4d3a;font-size:11px;padding:24px;letter-spacing:1px;border-top:1px solid var(--line)}
+  .countdown{display:inline-block;margin-top:9px;font-size:12px;letter-spacing:1px;color:var(--gold2);background:rgba(201,162,75,.1);border:1px solid var(--line);border-radius:20px;padding:5px 14px}
+  .countdown b{color:#fff}
+  .sfxtoggle{position:fixed;top:10px;right:12px;z-index:3;background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:20px;padding:5px 11px;font-size:12px;cursor:pointer}
+  .sfxtoggle:hover{color:var(--gold);border-color:var(--gold)}
+  .pgncat{margin-bottom:10px}
+  .pgncat b{color:var(--gold2);font-size:13px}
+  .pgncat span{display:block;font-size:12.5px;color:var(--txt);margin-top:2px;line-height:1.4}
+  @media(max-width:560px){
+    header h1{font-size:21px;letter-spacing:1.5px}
+    .tab{padding:9px 13px;font-size:12px}
+    .wrap{padding:14px 10px 50px}
+    .card{padding:14px 14px}
+    .calc input,.calc select{width:100%}
+    .calc>div{flex:1 1 100%}
+  }
+</style>
+</head>
+<body>
+<div id="embers"></div>
+<div class="sfxtoggle" id="sfxbtn" onclick="toggleSfx()">🔊 SFX</div>
+<header>
+  <h1>⚔ Diablo 3 — Season 39 Master Guide</h1>
+  <p>Shades of the Nephalem · all 7 classes · pick a class & build · works fully offline</p>
+  <div class="countdown" id="countdown"></div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-view="guide">Build Guide</div>
+  <div class="tab" data-view="journey">Season Journey</div>
+  <div class="tab" data-view="tools">Tools & Reference</div>
+</div>
+
+<div class="wrap">
+
+<!-- ===== BUILD GUIDE ===== -->
+<div class="view active" id="guide">
+  <div class="pickers">
+    <div style="flex:1 1 260px"><label>Class</label><div class="chiprow" id="classbtns"></div></div>
+    <div style="flex:1 1 260px"><label>Goal Build</label><div class="chiprow" id="buildbtns"></div></div>
+  </div>
+  <div class="progwrap">
+    <div class="progbar"><div class="progfill" id="gprog"></div></div>
+    <div class="progtxt" id="gprogtxt">0 / 0 upgrade steps complete</div>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <h2>The Plan</h2>
+      <div class="stat-row"><span>Class</span><span id="pClass"></span></div>
+      <div class="stat-row"><span>Season</span><span>39 · Shades of the Nephalem</span></div>
+      <div class="stat-row"><span>Free Set (Haedrig's)</span><span id="pFree"></span></div>
+      <div class="stat-row"><span>Goal Build</span><span id="pGoal"></span></div>
+      <div class="stat-row"><span>Build Uses Set</span><span id="pSet"></span></div>
+      <div class="stat-row"><span>Main Stat</span><span id="pMain"></span></div>
+    </div>
+    <div class="card">
+      <h2>Leveling Plan (1 → 70)</h2>
+      <ul class="gear" id="pLevel"></ul>
+    </div>
+    <div class="card full">
+      <h2>Paragon Priority <span class="slot" id="pgnTip"></span></h2>
+      <div class="grid" style="gap:14px" id="pgnGrid"></div>
+      <div class="tdesc" style="font-size:12px;margin-top:10px;color:var(--muted)">Caps: Movement Speed 25% total (gear + paragon) · Paragon Cooldown Reduction 10% · Attack Speed / Crit Chance / Crit Damage / Resource Cost Reduction each cap at 50 points.</div>
+    </div>
+    <div class="card full">
+      <h2>🎯 Endgame Target — <span id="pBuildName" style="text-transform:none;letter-spacing:0;color:var(--gold2)"></span></h2>
+      <div class="setline">Uses <b id="gsetline"></b> · <span id="gtagline"></span></div>
+      <div class="howbox" id="ghow"></div>
+      <div class="grid" style="gap:14px">
+        <div>
+          <div class="sub">Active Skills</div><ul class="gear" id="gskills"></ul>
+          <div class="sub">Passives</div><ul class="gear" id="gpassives"></ul>
+        </div>
+        <div>
+          <div class="sub">Key Legendaries</div><ul class="gear" id="glegendaries"></ul>
+          <div class="sub">Kanai's Cube</div><ul class="gear" id="gcube"></ul>
+          <div class="sub">Legendary Gems</div><ul class="gear" id="ggems"></ul>
+        </div>
+      </div>
+    </div>
+    <div class="card full">
+      <h2>Upgrade Checklist <button class="btn" onclick="resetGuide()" style="float:right">Reset</button></h2>
+      <div id="gtasks"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SEASON JOURNEY ===== -->
+<div class="view" id="journey">
+  <div class="progwrap">
+    <div class="progbar"><div class="progfill" id="jnyprog"></div></div>
+    <div class="progtxt" id="jnyprogtxt">0 / 0 journey objectives complete</div>
+  </div>
+  <div class="howbox">
+    <b>Season 39 Journey.</b> Work down the tiers — <b>Chapters II–IV</b> grant your free Haedrig's set, then
+    <b>Slayer → Champion → Destroyer → Conqueror → Guardian</b>. Reaching <b style="color:var(--gold2)">Conqueror earns the extra stash tab</b>,
+    and Guardian grants the exclusive seasonal cosmetics. Progress saves on this device.
+  </div>
+  <div class="grid" id="jnytiers"></div>
+  <div class="card full" style="margin-top:18px">
+    <h2>Conquests <span id="jnycqcount" style="margin-left:auto;font-size:12px;letter-spacing:1px"></span></h2>
+    <div class="howbox">Conqueror needs <b>2</b> conquests · Guardian needs <b>3</b>. The <span class="pill med">Easy</span>-tagged ones are friendliest for a fresh hero — a common trio is <b>On a Good Day</b> + <b>Sprinter</b> + <b>Speed Demon</b>. (HC = Hardcore name.)</div>
+    <div id="jnyconquests"></div>
+  </div>
+</div>
+
+<!-- ===== TOOLS ===== -->
+<div class="view" id="tools">
+  <div class="grid">
+    <div class="card full">
+      <h2>Kadala Blood Shard Calculator</h2>
+      <div class="calc">
+        <div><label>Blood shards available</label><input type="number" id="shards" value="500" min="0" oninput="calcShards()"></div>
+        <div><label>Gamble slot</label><select id="slot" onchange="calcShards()">
+          <option value="25">Shoulders / Gloves / Boots / Belt / Bracers (25)</option>
+          <option value="50">Legs / Rings (50)</option>
+          <option value="75">Chest / Weapons (75)</option>
+          <option value="100">Amulets (100)</option>
+        </select></div>
+      </div>
+      <div class="calcout" id="shardout"></div>
+    </div>
+    <div class="card">
+      <h2>Cooldown Reduction Calculator</h2>
+      <div id="cdrsources"></div>
+      <div class="calc" style="margin-top:10px">
+        <div><label>Paragon CDR % (0–10)</label><input type="number" id="cdrpara" value="0" min="0" max="10" step="0.2" oninput="calcCDR()"></div>
+        <div><label>Other / custom %</label><input type="number" id="cdrcustom" value="0" min="0" max="80" oninput="calcCDR()"></div>
+        <div><label>Base cooldown (sec)</label><input type="number" id="cdrbase" value="120" min="0" oninput="calcCDR()"></div>
+      </div>
+      <div id="cdrpresets" style="margin-top:8px;font-size:12px;color:var(--muted)"></div>
+      <div class="calcout" id="cdrout"></div>
+    </div>
+    <div class="card">
+      <h2>Augment Calculator <span class="slot" id="augclass"></span></h2>
+      <div class="calc">
+        <div><label>Legendary gem rank</label><input type="number" id="augrank" value="100" min="1" oninput="calcAug()"></div>
+        <button class="btn" onclick="calcAug()">Calculate</button>
+      </div>
+      <div class="calcout" id="augout"></div>
+    </div>
+    <div class="card full">
+      <h2>Character Check — Gap Analysis <span class="slot" id="gapbuild"></span></h2>
+      <div class="howbox">Tick the BiS items you own for your <b>selected class & build</b> (set them on the Build Guide tab). <i>True one-click Blizzard armory import can't run from a local file — the API needs an OAuth token and blocks browser access — so this is the offline equivalent.</i></div>
+      <div class="calc" style="margin-bottom:10px">
+        <div><label>Your current CDR %</label><input type="number" id="gapcdr" min="0" max="80"></div>
+        <div><label>Your main stat</label><input type="number" id="gapmain" min="0"></div>
+        <button class="btn" onclick="saveGapStats()">Save stats</button>
+      </div>
+      <div id="gapitems"></div>
+      <div class="calcout" id="gapout"></div>
+    </div>
+    <div class="card full">
+      <h2>Export / Import Progress</h2>
+      <div class="howbox">Copy your <b>progress code</b> to move between PCs — or paste someone else's code and hit <b>Compare</b> to see Journey progress side by side. <b>Compare</b> never changes your data; <b>Load</b> replaces it.</div>
+      <div style="margin-bottom:8px"><button class="btn" onclick="exportCode()">Copy my progress code</button> <span id="expmsg" class="slot"></span></div>
+      <textarea id="impcode" placeholder="Paste a progress code here…" style="width:100%;min-height:64px;background:#120c08;border:1px solid var(--line);color:var(--gold2);border-radius:6px;padding:9px;font-size:12px"></textarea>
+      <div style="margin-top:8px"><button class="btn" onclick="compareCode()">Compare</button> <button class="btn" onclick="importCode()">Load (replace mine)</button></div>
+      <div class="calcout" id="impout"></div>
+    </div>
+    <div class="card full">
+      <h2>Season 39 Haedrig's Gift Path</h2>
+      <div class="tdesc" style="font-size:13.5px;line-height:1.7">
+        Completing Season Journey <b>Chapters 2, 3 and 4</b> grants your class's full free 6-piece set in three gift bags
+        (Chapter 4 requires a solo <b>GR20</b>). Make sure your <b>seasonal</b> hero completes the chapters. Builds that use a
+        different set use the free set as a bridge, then farm their set via Kadala + Kanai's Cube "Upgrade Rare".
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<footer>Diablo 3 Season 39 · all data from current Maxroll / Icy Veins guides · offline · progress saved per device</footer>
+
+<script>
+/* ============ DATA ============ */
+const ORDER=["barbarian","crusader","demonhunter","monk","witchdoctor","wizard","necromancer"];
+const CLASSES={
+ barbarian:{name:"Barbarian",mainStat:"Strength",gemType:"Ruby",freeSet:"Wrath of the Wastes",
+  leveling:["Whirlwind + Rend (or Frenzy) to blast packs","Sprint / Furious Charge to move","Gem of Ease in your weapon to power-level","Grab Ring of Royal Grandeur from Act I caches"],
+  order:["ww","lodhota"],
+  builds:{
+   ww:{name:"Waste Whirlwind Rend",set:"Wrath of the Wastes",free:true,tag:"Free Haedrig's set · top-tier spin-to-win clear",
+    how:"Wrath of the Wastes makes Whirlwind apply a massive Rend DoT (via Ambo's Pride). You spin through everything while Rend kills it — fast, mobile, and one of the strongest builds in the game.",
+    skills:[["Whirlwind","Hurricane","applies Rend"],["Rend","Bloodbath","DoT"],["Wrath of the Berserker","Insanity","buff"],["Furious Charge","Battering Ram","Band of Might + buffs"],["Sprint","Run Like the Wind","move + dust devils"],["Ignore Pain","Mob Rule","defense"]],
+    passives:["Rampage","Boon of Bul-Kathos","Berserker Rage","Brawler"],
+    legendaries:[["In-geom / Echoing Fury","weapon"],["Ambo's Pride","weapon (applies Rend)"],["Lamentation","belt"],["Mortick's Brace / Nemesis Bracers","bracers"],["Pauldrons of the Wastes","shoulders"],["Focus & Restraint","rings"]],
+    cube:[["The Furnace","weapon"],["Mantle of Channeling","armor"],["Band of Might","jewelry"]],
+    gems:["Bane of the Trapped","Taeguk","Bane of the Stricken"]},
+   lodhota:{name:"LoD Hammer of the Ancients",set:"Legacy of Dreams (no set)",free:false,lod:true,tag:"Legacy of Dreams · very tanky burst (no set)",
+    how:"A Legacy of Dreams build (no class set) — 13 ancient Legendaries + the LoD gem. Hammer of the Ancients hits like a truck, scaling its crit with your Fury.",
+    skills:[["Hammer of the Ancients","Smash","main DPS"],["Call of the Ancients","Together as One","buff/minions"],["Ground Stomp","Wrenching Smash","group + Band of Might"],["Wrath of the Berserker","Insanity","buff"],["Battle Rage","Bloodshed","buff"],["War Cry","Impunity","defense"]],
+    passives:["Rampage","Boon of Bul-Kathos","Berserker Rage","Brawler"],
+    legendaries:[["Remorseless","weapon"],["Echoing Fury","off-hand"],["Bracers of the First Men","bracers"],["The Witching Hour","belt"],["Band of Might","ring"],["Convention of Elements","ring"],["Fury of the Ancients","shoulders"]],
+    cube:[["The Gavel of Judgment","weapon"],["Aquila Cuirass","armor"],["Obsidian Ring of the Zodiac","jewelry"]],
+    gems:["Legacy of Dreams","Bane of the Trapped","Bane of the Stricken"]}
+  }},
+ crusader:{name:"Crusader",mainStat:"Strength",gemType:"Ruby",freeSet:"Roland's Legacy",
+  leveling:["Blessed Hammer (Limitless) main damage","Condemn (Vacuum) to pull packs + Steed Charge to move","Laws of Valor (Unstoppable Force) + Provoke for resource","Gem of Ease in your weapon to power-level"],
+  order:["roland","akkhan","aov","invoker"],
+  builds:{
+   roland:{name:"Roland's Sweep Attack",set:"Roland's Legacy",free:true,tag:"Free Haedrig's set · easy spin-to-win",
+    how:"The free Haedrig's set this season, so the fastest build to assemble. Sweep Attack with very high Attack Speed for steady damage and constant self-healing.",
+    skills:[["Sweep Attack","Blazing Sweep","main DPS + heal"],["Iron Skin","Flash","defense + speed"],["Akarat's Champion","Prophet","staple buff"],["Laws of Valor","Unstoppable Force",""],["Condemn","Vacuum","grouping"],["Steed Charge","Draw and Quarter",""]],
+    passives:["Heavenly Strength","Finery","Indestructible","Holy Cause"],
+    legendaries:[["The Furnace / Flail of the Charge","weapon"],["Denial","shield"],["Strongarm Bracers","bracers"],["Captain Crimson's Silk Girdle","belt"],["Obsidian Ring of the Zodiac","ring"],["Avarice Band","ring"]],
+    cube:[["Golden Flense","weapon"],["Aquila Cuirass","armor"],["Ring of Royal Grandeur","jewelry"]],
+    gems:["Bane of the Trapped","Bane of the Stricken","Gogok of Swiftness"]},
+   akkhan:{name:"Akkhan Condemn",set:"Armor of Akkhan",free:false,tag:"Tier A · strong solo pusher (AoE bomber)",
+    how:"Condemn bomber — triggers a huge number of explosions per second for massive AoE with good survivability. Uses Armor of Akkhan (not the free set).",
+    skills:[["Phalanx","Bowmen","Shield Bearers for push"],["Judgment","Debilitate","debuff"],["Condemn","Shattering Explosion","Unleashed for speeds"],["Akarat's Champion","Prophet",""],["Laws of Hope","Wings of Angels","or Laws of Valor"],["Steed Charge","Endurance",""]],
+    passives:["Heavenly Strength","Finery","Long Arm of the Law","Indestructible"],
+    legendaries:[["Blade of Prophecy","weapon"],["Frydehr's Wrath","offhand"],["Warhelm of Kassar","helm"],["Strongarm Bracers","bracers"],["Captain Crimson's Silk Girdle","belt"],["The Compass Rose","ring"]],
+    cube:[["In-Geom","weapon"],["Tasker and Theo","armor"],["Ring of Royal Grandeur","jewelry"]],
+    gems:["Bane of the Trapped","Enforcer","Bane of the Stricken"]},
+   aov:{name:"AoV Fist of the Heavens",set:"Aegis of Valor",free:false,tag:"Best speed-farmer (keys & bounties)",
+    how:"The premier speed-farming build — mobile ranged AoE that's easy to play. Uses Aegis of Valor (not the free set).",
+    skills:[["Fist of the Heavens","Fissure","main DPS"],["Iron Skin","Flash","defense"],["Steed Charge","Endurance","mobility"],["Akarat's Champion","Prophet",""],["Laws of Hope","Wings of Angels",""],["Justice","Hammer of Pursuit","Wrath"]],
+    passives:["Heavenly Strength","Indestructible","Lord Commander","Finery"],
+    legendaries:[["Flail of the Charge","weapon"],["Shield of the Steed","shield"],["Nemesis Bracers","bracers"],["Vigilante Belt","belt"],["Rechel's Ring of Larceny","ring"],["Avarice Band","ring"]],
+    cube:[["Darklight","weapon"],["Khassett's Cord of Righteousness","armor"],["Ring of Royal Grandeur","jewelry"]],
+    gems:["Zei's Stone of Vengeance","Molten Wildebeest's Gizzard","Boon of the Hoarder"]},
+   invoker:{name:"Invoker Thorns",set:"Thorns of the Invoker",free:false,tag:"Tanky Rift-Guardian killer & support",
+    how:"Thorns build — your attacks deal damage based on your Thorns stat (≈99% from Slash). Very durable; great RGK and group support. Uses Thorns of the Invoker (not the free set).",
+    skills:[["Slash","Zeal","main attack"],["Iron Skin","Reflective Skin","defense"],["Akarat's Champion","Prophet",""],["Laws of Valor","Unstoppable Force",""],["Bombardment","Annihilate","burst"],["Steed Charge","Draw and Quarter",""]],
+    passives:["Fervor","Heavenly Strength","Finery","Iron Maiden"],
+    legendaries:[["Pig Sticker","weapon"],["Shield of the Steed","shield"],["Shackles of the Invoker","bracers"],["Captain Crimson's Silk Girdle","belt"],["The Compass Rose","ring"],["The Traveler's Pledge","amulet"]],
+    cube:[["The Furnace","weapon"],["Leoric's Crown","armor"],["Convention of Elements","jewelry"]],
+    gems:["Boyarsky's Chip","Bane of the Stricken","Bane of the Trapped"]}
+  }},
+ demonhunter:{name:"Demon Hunter",mainStat:"Dexterity",gemType:"Emerald",freeSet:"Unhallowed Essence",
+  leveling:["Multishot or Strafe to blast packs","Keep Discipline up (set scales with current Discipline)","Vault to move; Gem of Ease in your weapon","Grab Ring of Royal Grandeur from Act I caches"],
+  order:["ue"],
+  builds:{
+   ue:{name:"UE Multishot",set:"Unhallowed Essence",free:true,tag:"Free Haedrig's set · easy ranged blaster, top T16 farmer",
+    how:"Unhallowed Essence supercharges Multishot — fire it many times per second to clear whole screens. Keep your Discipline high (the set scales with current Discipline). Easy and a fantastic farmer.",
+    skills:[["Multishot","Arsenal","main DPS"],["Vengeance","Seethe","buff"],["Companion","Wolf Companion","buff"],["Preparation","Invigoration","Discipline"],["Evasive Fire","Focus","keeps Bastions/Wraps buffs"],["Vault","Tumble","mobility"]],
+    passives:["Ambush","Tactical Advantage","Ballistics","Blood Vengeance"],
+    legendaries:[["Yang's Recurve","weapon"],["Dead Man's Legacy","quiver"],["Wraps of Clarity","bracers"],["Captain Crimson's Silk Girdle","belt"],["Focus & Restraint","rings"],["Unsanctified Shoulders","shoulders"]],
+    cube:[["Dawn","weapon"],["Ring of Royal Grandeur","armor"],["Convention of Elements","jewelry"]],
+    gems:["Zei's Stone of Vengeance","Bane of the Trapped","Boon of the Hoarder"]}
+  }},
+ monk:{name:"Monk",mainStat:"Dexterity",gemType:"Emerald",freeSet:"Raiment of a Thousand Storms",
+  leveling:["A generator (or Tempest Rush) + Sweeping Wind","Dashing Strike to move; Gem of Ease in your weapon","Grab Ring of Royal Grandeur from Act I caches"],
+  order:["poj","raiment"],
+  builds:{
+   poj:{name:"PoJ Tempest Rush",set:"Patterns of Justice",free:false,tag:"Top Monk build · drag-and-detonate spin-to-win",
+    how:"Patterns of Justice powers Tempest Rush (Flurry) with Won Khim Lau, Balance and Cesar's Memento — drag packs together and detonate them on each Cold Convention of Elements cycle. Strong all-rounder. Not the free set, so farm it after Raiment.",
+    skills:[["Tempest Rush","Flurry","main DPS"],["Sweeping Wind","Inner Storm","Spirit"],["Epiphany","Desert Shroud","buff + defense"],["Blinding Flash","Faith in the Light","buff"],["Dashing Strike","Way of the Falling Star","mobility"],["Mantra of Conviction","Annihilation","debuff"]],
+    passives:["Beacon of Ytar","Seize the Initiative","Harmony","The Guardian's Path"],
+    legendaries:[["Won Khim Lau","weapon"],["Balance","off-hand"],["Cesar's Memento","bracers"],["Captain Crimson's Silk Girdle","belt"],["Obsidian Ring of the Zodiac","ring"],["Avarice Band","ring"]],
+    cube:[["In-Geom","weapon"],["Aquila Cuirass","armor"],["Ring of Royal Grandeur","jewelry"]],
+    gems:["Bane of the Trapped","Taeguk","Gogok of Swiftness"]},
+   raiment:{name:"Raiment Generator",set:"Raiment of a Thousand Storms",free:true,tag:"Free Haedrig's set · very fast, but weakest Monk build",
+    how:"Raiment uses Dashing Strike to give Spirit Generators a big damage burst. It's the free set and plays fast, but it's notably weaker than PoJ — treat it as a starter and switch to Patterns of Justice for pushing.",
+    skills:[["Crippling Wave","Mangle","generator"],["Way of the Hundred Fists","Assimilation","generator"],["Dashing Strike","Radiance","damage burst"],["Cyclone Strike","Implosion","grouping"],["Mantra of Salvation","Agility","defense"],["Breath of Heaven","Infused with Light","heal + buff"]],
+    passives:["Combination Strike","Exalted Soul","Alacrity","Seize the Initiative"],
+    legendaries:[["Shenlong's Fist of Legend","weapon"],["Shenlong's Relentless Assault","off-hand"],["Spirit Guards","bracers"],["The Witching Hour","belt"],["Convention of Elements","ring"],["The Compass Rose","ring"]],
+    cube:[["Flying Dragon","weapon"],["Depth Diggers","armor"],["Ring of Royal Grandeur","jewelry"]],
+    gems:["Simplicity's Strength","Bane of the Trapped","Bane of the Stricken"]}
+  }},
+ witchdoctor:{name:"Witch Doctor",mainStat:"Intelligence",gemType:"Topaz",freeSet:"Helltooth Harness",
+  leveling:["Zombie Charger / Gargantuan + Locust Swarm","Spirit Walk to move; Gem of Ease in your weapon","Grab Ring of Royal Grandeur from Act I caches"],
+  order:["helltooth","mundunugu"],
+  builds:{
+   helltooth:{name:"Helltooth Gargantuan",set:"Helltooth Harness",free:true,tag:"Free Haedrig's set · laid-back pet build",
+    how:"Helltooth Harness pumps your Gargantuans to do the work while you keep buffs up (Wall of Death, Soul Harvest). Relaxed, durable, easy to play.",
+    skills:[["Gargantuan","Restless Giant","main DPS (pets)"],["Wall of Death","Communing with Spirits","Helltooth buff"],["Soul Harvest","Languish","buff + slow"],["Spirit Walk","Jaunt","mobility"],["Piranhas","Piranhado","grouping + dmg"],["Locust Swarm","Pestilence","Helltooth buff"]],
+    passives:["Midnight Feast","Confidence Ritual","Pierce the Veil","Spirit Vessel"],
+    legendaries:[["Sacred Harvester","weapon"],["Spite","off-hand (mojo)"],["Lakumba's Ornament","bracers"],["The Witching Hour","belt"],["The Short Man's Finger","ring"],["Ring of Emptiness","ring"]],
+    cube:[["Echoing Fury","weapon"],["Shukrani's Triumph","armor"],["Convention of Elements","jewelry"]],
+    gems:["Enforcer","Bane of the Trapped","Bane of the Stricken"]},
+   mundunugu:{name:"Mundunugu Spirit Barrage",set:"Mundunugu's Regalia",free:false,tag:"Best WD farmer · Manitou attacks while you move",
+    how:"Mundunugu's Regalia + Gazing Demise make Spirit Barrage (Manitou) fire continuously even while moving — insane AoE and a top Nephalem/GR farmer. Not the free set, so farm it after Helltooth.",
+    skills:[["Spirit Barrage","Manitou","main DPS"],["Locust Swarm","Pestilence","dmg + Ring of Emptiness"],["Spirit Walk","Jaunt","mobility"],["Big Bad Voodoo","Ghost Trance","buff"],["Soul Harvest","Languish","buff"],["Piranhas","Piranhado","grouping"]],
+    passives:["Rush of Essence","Grave Injustice","Confidence Ritual","Gruesome Feast"],
+    legendaries:[["The Barber","weapon"],["Gazing Demise","off-hand (mojo)"],["Lakumba's Ornament","bracers"],["Captain Crimson's Silk Girdle","belt"],["Ring of Emptiness","ring"],["The Compass Rose","ring"]],
+    cube:[["Echoing Fury","weapon"],["Aquila Cuirass","armor"],["Ring of Royal Grandeur","jewelry"]],
+    gems:["Bane of the Trapped","Gogok of Swiftness","Bane of the Stricken"]}
+  }},
+ wizard:{name:"Wizard",mainStat:"Intelligence",gemType:"Topaz",freeSet:"Tal Rasha's Elements",
+  leveling:["Arcane Torrent / Meteor + Magic Weapon","Teleport to move; Gem of Ease in your weapon","Grab Ring of Royal Grandeur from Act I caches"],
+  order:["talrasha","typhon"],
+  builds:{
+   talrasha:{name:"Tal Rasha Meteor",set:"Tal Rasha's Elements",free:true,tag:"Free Haedrig's set · burst-y meteor caster",
+    how:"Tal Rasha's Elements rains Meteors of every element. Cast different-element spells to stack the set, then drop Meteors for big bursts. Satisfying and effective.",
+    skills:[["Meteor","Comet / Thunder Crash","main DPS"],["Storm Armor","Power of the Storm","defense"],["Teleport","Safe Passage","mobility"],["Familiar","Sparkflint","buff"],["Black Hole","Spellsteal","grouping + buff"],["Spectral Blade","Ice Blades","Fragment of Destiny synergy"]],
+    passives:["Power Hungry","Elemental Exposure","Galvanizing Ward","Arcane Dynamo"],
+    legendaries:[["The Grand Vizier","weapon"],["Tal Rasha's Unwavering Glare","off-hand"],["Guardian's Aversion","bracers"],["Tal Rasha's Brace","belt"],["Halo of Karini","ring"],["Convention of Elements","ring"]],
+    cube:[["The Smoldering Core","weapon"],["The Shame of Delsere","armor"],["Ring of Royal Grandeur","jewelry"]],
+    gems:["Bane of the Trapped","Zei's Stone of Vengeance","Bane of the Stricken"]},
+   typhon:{name:"Typhon Hydra",set:"Typhon's Veil",free:false,tag:"Super tanky · stationary Hydra pet damage",
+    how:"Typhon's Veil makes a field of Hydras melt everything while you stay shielded. Very tanky; great solo pushing and farming. Not the free set, so farm it after Tal Rasha.",
+    skills:[["Hydra","Frost Hydra","main DPS"],["Blizzard","Apocalypse","dmg + Winter Flurry"],["Spectral Blade","Barrier Blades","shield"],["Storm Armor","Shocking Aspect","defense"],["Black Hole","Absolute Zero","grouping"],["Teleport","Safe Passage","mobility"]],
+    passives:["Galvanizing Ward","Elemental Exposure","Audacity","Arcane Dynamo"],
+    legendaries:[["Serpent's Sparker","weapon"],["Winter Flurry","off-hand"],["Ashnagarr's Blood Bracer","bracers"],["The Shame of Delsere","belt"],["Halo of Karini","ring"],["Convention of Elements","ring"]],
+    cube:[["Fragment of Destiny","weapon"],["Tasker and Theo","armor"],["Ring of Royal Grandeur","jewelry"]],
+    gems:["Enforcer","Bane of the Trapped","Bane of the Stricken"]}
+  }},
+ necromancer:{name:"Necromancer",mainStat:"Intelligence",gemType:"Topaz",freeSet:"Bones of Rathma",
+  leveling:["Skeletal Mage (Singularity) + Command Skeletons","Bone Armor + Land of the Dead; Blood Rush to move","Reaper's Wraps + Gem of Ease in your weapon"],
+  order:["rathma","masq","rat"],
+  builds:{
+   rathma:{name:"Rathma Army of the Dead",set:"Bones of Rathma",free:true,tag:"Free Haedrig's set · huge burst / RGK · harder to play",
+    how:"Bones of Rathma stacks a massive bonus on Army of the Dead from active minions (~29,750% at 17). Command Skeletons & Revive reset its cooldown for a steady nuke stream. Squishy & cooldown-hungry — stack Cooldown Reduction (Diamonds everywhere).",
+    skills:[["Army of the Dead","Death Valley","nuke"],["Command Skeletons","Frenzy","minions + reset"],["Revive","","10 minions for the bonus"],["Siphon Blood","Power Shift","Essence"],["Decrepify","Borrowed Time","CDR curse"],["Bone Armor","Dislocation","defense"]],
+    passives:["Grisly Tribute","Final Service","Spreading Malediction","Rigor Mortis"],
+    legendaries:[["Jesseth Skullscythe","weapon"],["Jesseth Skullshield","offhand"],["Rathma's Spikes","shoulders"],["Bonds of C'Lena","bracers"],["Captain Crimson's Silk Girdle","belt"],["Krysbin's Sentence + Convention of Elements","rings"]],
+    cube:[["Funerary Pick","weapon"],["Fate's Vow","armor"],["Ring of Royal Grandeur","jewelry"]],
+    gems:["Bane of the Trapped","Esoteric Alteration","Zei's Stone of Vengeance"]},
+   masq:{name:"Masquerade Bone Spear",set:"Masquerade of the Burning Carnival",free:false,tag:"Top DPS · active, no cooldown reliance · great trash clear",
+    how:"Masquerade gives ~83% damage reduction while Simulacrum is active plus a huge Bone Spear multiplier. Fire Bone Spear through Simulacrums for big AoE. Not the free set — farm it after Rathma.",
+    skills:[["Bone Spear","Blighted Marrow","main DPS"],["Simulacrum","","powered by the set"],["Grim Scythe","Frost Scythe","Essence + slow"],["Bone Armor","Dislocation","defense"],["Blood Rush","Metabolism","mobility"],["Decrepify","Borrowed Time","curse"]],
+    passives:["Bone Prison","Serration","Stand Alone","Spreading Malediction"],
+    legendaries:[["Scythe of the Cycle","weapon"],["Lost Time","offhand"],["Gelmindor's Marrow Guards","bracers"],["Dayntee's Binding","belt"],["Krysbin's Sentence","ring"],["Convention of Elements","ring"],["Glamorous Gigot","shoulders"]],
+    cube:[["Reilena's Shadowhook","weapon"],["Aquila Cuirass","armor"],["Ring of Royal Grandeur","jewelry"]],
+    gems:["Zei's Stone of Vengeance","Bane of the Trapped","Bane of the Stricken"]},
+   rat:{name:"LoD Skeletal Mage (Rat)",set:"Legacy of Dreams (no set)",free:false,lod:true,tag:"Famous group XP build, also strong solo · no set",
+    how:"A Legacy of Dreams build (no set) — 13 ancient Legendaries + the LoD gem. Constant Skeletal Mage (Singularity) damage. The infamous 'Rat' group-XP build. LoD gear/cube can vary — check Maxroll.",
+    skills:[["Skeletal Mage","Life Support","main DPS"],["Simulacrum","Reservoir","Essence"],["Land of the Dead","Frozen Lands","damage window"],["Bone Armor","Harvest of Anguish","defense"],["Blood Rush","Metabolism","mobility"],["Devour","Satiated","Essence"]],
+    passives:["Overwhelming Essence","Dark Reaping","Final Service","Extended Servitude"],
+    legendaries:[["Scythe of the Cycle","weapon"],["Lost Time","offhand"],["Reaper's Wraps","bracers"],["The Witching Hour","belt"],["Krysbin's Sentence","ring"],["Circle of Nailuj's Evol","ring"]],
+    cube:[["Reilena's Shadowhook","weapon"],["Requiem Cereplate","armor"],["Haunted Visions","jewelry"]],
+    gems:["Legacy of Dreams","Bane of the Trapped","Enforcer"]}
+  }}
+};
+
+/* ============ THEMES / PARAGON ============ */
+const THEMES={
+ barbarian:["#c0392b","#e8705f","#3a1410"],
+ crusader:["#c9a24b","#e8c878","#2a1a10"],
+ demonhunter:["#5a9f4a","#8fce7a","#16240f"],
+ monk:["#36a69a","#6fe0d4","#0e2422"],
+ witchdoctor:["#c87a2b","#e8a85c","#2a1a0e"],
+ wizard:["#5a86c9","#90b6e8","#101a2c"],
+ necromancer:["#8a5fc9","#b3a8e8","#1e1430"]
+};
+function applyTheme(cId){const t=THEMES[cId]||THEMES.crusader,r=document.documentElement.style;r.setProperty('--gold',t[0]);r.setProperty('--gold2',t[1]);r.setProperty('--tint',t[2])}
+const RES={barbarian:"Fury",crusader:"Wrath",demonhunter:"Hatred / Discipline",monk:"Spirit",witchdoctor:"Mana",wizard:"Arcane Power",necromancer:"Essence"};
+const PGN_TIP={rathma:"CDR is king — max Cooldown Reduction in Offense.",masq:"Area Damage + Crit; some CDR for Simulacrum/Bone Armor uptime.",rat:"Prioritize Area Damage; pets love it.",helltooth:"Pet build — Area Damage is huge in Utility.",typhon:"Pet build — Area Damage + Crit, plenty of toughness.",ww:"Attack Speed boosts Whirlwind/Rend ticks.",aov:"Movement Speed first for speed-farming, then damage.",poj:"Area Damage shines on the detonations."};
+function renderParagon(cId,c,bId){
+  const res=RES[cId]||"resource";
+  const cats=[
+    ["Core","Movement Speed to 25% (with boots), then <b>"+c.mainStat+"</b>, then Vitality as needed, then Maximum "+res+"."],
+    ["Offense","Critical Hit Damage → Critical Hit Chance → Cooldown Reduction (cap 10%) → Attack Speed."],
+    ["Defense","All Resistance → Life % → Armor → Life Regeneration."],
+    ["Utility","Area Damage → Resource Cost Reduction → Life on Hit → Gold/Globe radius."]
+  ];
+  document.getElementById('pgnGrid').innerHTML=cats.map(x=>`<div class="pgncat"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("");
+  document.getElementById('pgnTip').textContent=PGN_TIP[bId]?('· Tip: '+PGN_TIP[bId]):'';
+}
+
+/* ============ TASK GENERATION ============ */
+function makeTasks(cId,c,bId,b){
+  const t=[];
+  t.push({t:"Level 1 → 70",d:c.leveling.join(". ")+".",p:"prio"});
+  t.push({t:"Unlock Kanai's Cube",d:"Run 'The Royal Quarters' in Act III to recover the Cube.",p:"prio"});
+  t.push({t:"Complete Season Journey Chapters 2–4",d:"Grants the free "+c.freeSet+" set (Chapter 4 needs a solo GR20).",p:"prio"});
+  if(b.lod){
+    t.push({t:"Get the Legacy of Dreams gem",d:"Awarded on your first solo Greater Rift clear of the season. It replaces a class set.",p:"prio"});
+    t.push({t:"Collect 13 ancient Legendaries",d:"LoD multiplies your damage per equipped (ancient) Legendary — fill every slot with ancients.",p:"prio"});
+  }else if(b.free){
+    t.push({t:"Equip the full "+b.set+" set",d:"Equip all 6 pieces and switch to this build's skill bar (above).",p:"prio"});
+  }else{
+    t.push({t:"Farm "+b.set+" (6-piece)",d:"Not the free set — use "+c.freeSet+" as a bridge, then gamble at Kadala + Cube 'Upgrade Rare' to target "+b.set+" pieces.",p:"prio"});
+  }
+  t.push({t:"Get your core items",d:"Priority: "+b.legendaries.slice(0,2).map(x=>x[0]).join(" + ")+".",p:"med"});
+  t.push({t:"Farm Ring of Royal Grandeur",d:"From Act I Horadric Caches; cube it to need one fewer set piece.",p:"med"});
+  t.push({t:"Set Kanai's Cube powers",d:b.cube.map(x=>x[0]).join(", ")+".",p:"med"});
+  t.push({t:"Slot legendary gems",d:b.gems.join(" + ")+". Level them in Greater Rifts.",p:""});
+  if(b.legendaries.length>2)t.push({t:"Acquire support legendaries",d:b.legendaries.slice(2).map(x=>x[0]).join(", ")+".",p:""});
+  t.push({t:"Push Greater Rifts & augment",d:"Level gems, then Caldesann's Despair augments (3 Flawless "+c.gemType+" + a leveled gem) for "+c.mainStat+".",p:""});
+  return t;
+}
+
+/* ============ BUILD GUIDE RENDER ============ */
+function li(h){return "<li>"+h+"</li>"}
+function slotTxt(s){return s?' <span class="slot">· '+s+'</span>':''}
+function curClassId(){const id=localStorage.getItem('d3master_class');return (id&&CLASSES[id])?id:'crusader'}
+function curBuildId(cId){const c=CLASSES[cId];const id=localStorage.getItem('d3master_build_'+cId);return (id&&c.builds[id])?id:c.order[0]}
+function gtKey(cId,bId){return 'd3master_tasks_'+cId+'_'+bId}
+function gtLoad(cId,bId){try{return JSON.parse(localStorage.getItem(gtKey(cId,bId)))||{}}catch(e){return {}}}
+
+function renderTasks(cId,bId,tasks){
+  const st=gtLoad(cId,bId);const host=document.getElementById('gtasks');host.innerHTML="";
+  tasks.forEach((task,i)=>{
+    const done=!!st[i];const el=document.createElement('div');el.className='task'+(done?' done':'');
+    const pill=task.p?`<span class="pill ${task.p}">${task.p==='prio'?'Priority':'Next'}</span>`:'';
+    el.innerHTML=`<div class="chk"></div><div><div class="ttitle">${task.t}${pill}</div><div class="tdesc">${task.d}</div></div>`;
+    el.onclick=()=>{const s=gtLoad(cId,bId);const nowDone=!s[i];s[i]=nowDone;localStorage.setItem(gtKey(cId,bId),JSON.stringify(s));renderTasks(cId,bId,tasks);if(nowDone&&task.p==='prio'){ding();const els=document.getElementById('gtasks').children;if(els[i])els[i].classList.add('flash')}};
+    host.appendChild(el);
+  });
+  const done=tasks.filter((_,i)=>st[i]).length;
+  document.getElementById('gprog').style.width=(done/tasks.length*100)+'%';
+  document.getElementById('gprogtxt').textContent=`${done} / ${tasks.length} upgrade steps complete`;
+}
+function renderGuide(){
+  const cId=curClassId(),c=CLASSES[cId],bId=curBuildId(cId),b=c.builds[bId];
+  applyTheme(cId);
+  renderClassChips();renderBuildChips(cId);
+  const setSpan=(b.lod?'<span class="leg">'+b.set+'</span>':'<span class="setc">'+b.set+'</span>');
+  document.getElementById('pClass').textContent=c.name;
+  document.getElementById('pFree').innerHTML='<span class="setc">'+c.freeSet+'</span>';
+  document.getElementById('pGoal').textContent=b.name;
+  document.getElementById('pSet').innerHTML=setSpan+((b.free||b.lod)?"":' <span class="slot">(farm it)</span>');
+  document.getElementById('pMain').textContent=c.mainStat+" → "+c.gemType+" augments";
+  document.getElementById('pLevel').innerHTML=c.leveling.map(x=>li(x)).join("");
+  document.getElementById('pBuildName').textContent=b.name;
+  document.getElementById('gsetline').innerHTML=setSpan+(b.free?" — the free Haedrig's set":(b.lod?" — no class set":" — not the free set"));
+  document.getElementById('gtagline').textContent=b.tag;
+  document.getElementById('ghow').innerHTML=b.how||"";
+  document.getElementById('gskills').innerHTML=b.skills.map(s=>li(`${s[0]}${s[1]?" — <b>"+s[1]+"</b>":""}${slotTxt(s[2])}`)).join("");
+  document.getElementById('gpassives').innerHTML=b.passives.map(p=>li(p)).join("");
+  document.getElementById('glegendaries').innerHTML=b.legendaries.map(g=>li('<span class="leg">'+g[0]+'</span>'+slotTxt(g[1]))).join("");
+  document.getElementById('gcube').innerHTML=b.cube.map(g=>li('<span class="leg">'+g[0]+'</span>'+slotTxt(g[1]))).join("");
+  document.getElementById('ggems').innerHTML=b.gems.map(g=>li('<span class="setc">'+g+'</span>')).join("");
+  renderParagon(cId,c,bId);
+  renderTasks(cId,bId,makeTasks(cId,c,bId,b));
+  // tools that depend on selection
+  if(document.getElementById('augclass'))updateAugClass();
+  if(document.getElementById('gapitems'))renderGap();
+}
+function renderClassChips(){
+  const cId=curClassId(),host=document.getElementById('classbtns');host.innerHTML="";
+  ORDER.forEach(id=>{const btn=document.createElement('button');btn.className='chip'+(id===cId?' active':'');btn.textContent=CLASSES[id].name;btn.onclick=()=>onClassChange(id);host.appendChild(btn)});
+}
+function renderBuildChips(cId){
+  const c=CLASSES[cId],bId=curBuildId(cId),host=document.getElementById('buildbtns');host.innerHTML="";
+  c.order.forEach(id=>{const btn=document.createElement('button');btn.className='chip'+(id===bId?' active':'');btn.innerHTML=c.builds[id].name+(c.builds[id].free?' ★':'');btn.onclick=()=>onBuildChange(id);host.appendChild(btn)});
+}
+function onClassChange(cId){localStorage.setItem('d3master_class',cId);renderGuide()}
+function onBuildChange(bId){localStorage.setItem('d3master_build_'+curClassId(),bId);renderGuide()}
+function resetGuide(){const cId=curClassId(),bId=curBuildId(cId);if(confirm('Reset all checkmarks for this build?')){localStorage.setItem(gtKey(cId,bId),'{}');renderGuide()}}
+(function initGuide(){renderGuide();})();
+
+/* ============ SEASON JOURNEY ============ */
+const JNY_PREFIX="d3master_jny_";
+const JOURNEY=[
+  {tier:"Chapter I",reward:"",objs:["Complete a Nephalem Rift (Normal+)","Complete 5 Bounties","Socket 5 gems into gear","Blacksmith to level 10","Jeweler to level 10","Mystic to level 10","Kill 2 bosses","Reach level 50"]},
+  {tier:"Chapter II",reward:"Haedrig's Gift (helm & gloves)",objs:["Nephalem Rift on Expert+","Craft a level 70 weapon/armor","Fully equip a follower","Blacksmith / Jeweler / Mystic to 12","Find Kanai's Cube (Elder Sanctum)","Reach level 70","Kill 2 bosses (lvl 60+, Hard+)","Craft a level 70 ring or amulet","Enchant: replace a property at Mystic","Transmogrify an item"]},
+  {tier:"Chapter III",reward:"Haedrig's Gift (boots & shoulders)",objs:["Nephalem Rift on Master+","Craft an Imperial+ gem","Spend Blood Shards at Kadala","Kill 2 bosses (lvl 70+, Master+)","Obtain all 5 Act bounty caches","Extract a Legendary Power (Cube)"]},
+  {tier:"Chapter IV",reward:"Final Haedrig's set pieces + frame",objs:["Level 70 Rift on Torment I+","Reforge a weapon property to a socket","Slay 4 Keywardens (T4+)","Kill 2 bosses (T4+)","Reach Greater Rift 20 solo","Upgrade a rare to legendary (Cube)","Learn 5 Blacksmith recipes","Learn 5 Jewelcrafting recipes"]},
+  {tier:"Slayer",reward:"Portrait frame",objs:["Level 70 Rift on Torment V+","Level a Legendary Gem to 25","Slay Ubers in Realms of Regret & Putridness","Get a legendary from Blood Shards","Complete any Set Dungeon","Kill 2 bosses (T7+)","Reach Greater Rift 30 solo","Equip Cube: weapon + armor + jewelry power"]},
+  {tier:"Champion",reward:"Portrait frame",objs:["Torment X Rift in under 6 min","Level 3 Legendary Gems to 35","Craft a Flawless Royal gem","Slay Ubers in Realms of Terror & Fright","Complete an Echoing Nightmare","Kill 2 bosses (T10+)","Reach Greater Rift 40 solo","Convert a Set item (Cube)"]},
+  {tier:"Destroyer",reward:"Portrait frame",objs:["Torment XII Rift in under 6 min","Level 3 Legendary Gems to 45","Craft a Hellfire Amulet","Complete 1 Conquest","Kill 2 bosses (T13+)","Reach Greater Rift 50 solo","Extract 20 Legendary Powers (Cube)"]},
+  {tier:"Conqueror",reward:"Portrait frame + 1 STASH TAB",milestone:true,objs:["Torment XII Rift in under 5 min","Level 3 Legendary Gems to 55","Complete 2 Conquests","Kill a boss (T13+)","Kill Greed in The Vault (T13+)","Reach Greater Rift 60 solo","Augment an Ancient item (Cube)","Reforge a Legendary item"]},
+  {tier:"Guardian",reward:"Exclusive seasonal cosmetics",milestone:true,objs:["Torment XIII Rift in under 4 min","Level 3 Legendary Gems to 70","Complete 3 Conquests","Kill a boss in under 20s (T13+)","Reach Greater Rift 70 solo","Extract 40 Legendary Powers (Cube)"]},
+];
+const CONQUESTS=[
+  {n:"On a Good Day",hc:"I Can't Stop",req:"Level 3 Legendary Gems to level 65.",easy:true},
+  {n:"Sprinter",hc:"Speed Racer",req:"Complete Acts I–V at level 70 in under 1 hour (any difficulty).",easy:true},
+  {n:"Speed Demon",hc:"Need for Speed",req:"Complete a level-70 Nephalem Rift on Torment X+ in under 2 minutes.",easy:true},
+  {n:"Avarice",hc:"Avaritia",req:"Complete a 50,000,000 gold streak (outside The Vault / Inner Sanctum).",easy:true},
+  {n:"Boss Mode",hc:"Worlds Apart",req:"Kill all Act I–V bosses within 20 minutes of game start.",easy:false},
+  {n:"Curses!",hc:"Stars Align",req:"Kill 350 monsters in a single Cursed Chest event (Torment X+).",easy:false},
+  {n:"The Thrill",hc:"Super Human",req:"Reach Greater Rift 45 solo with NO set items equipped.",easy:false},
+  {n:"Years of War",hc:"Dynasty",req:"Reach Greater Rift 55 solo using the full bonus of 6 class sets.",easy:false},
+  {n:"Masters of the Universe",hc:"Masters of Sets",req:"Complete 8 Set Dungeon masteries for your class.",easy:false},
+  {n:"Divinity",hc:"Lionhearted",req:"Reach Greater Rift level 75 solo.",easy:false},
+];
+function jnyLoad(k){try{return JSON.parse(localStorage.getItem(JNY_PREFIX+k))||{}}catch(e){return {}}}
+function jnySave(k,o){localStorage.setItem(JNY_PREFIX+k,JSON.stringify(o))}
+function renderJourney(){
+  const st=jnyLoad("journey"),host=document.getElementById("jnytiers");host.innerHTML="";let total=0,done=0;
+  JOURNEY.forEach((t,ti)=>{
+    const card=document.createElement("div");card.className="card tiercard"+(t.milestone?" milestone":"");let td=0;
+    const rows=t.objs.map((o,oi)=>{const k=ti+"-"+oi;const d=!!st[k];if(d){td++;done++}total++;return `<div class="obj${d?' done':''}" data-k="${k}"><div class="ck"></div><span>${o}</span></div>`}).join("");
+    card.innerHTML=`<h2>${t.tier}${t.reward?`<span class="reward">${t.reward}</span>`:""}</h2><div class="tierprog">${td} / ${t.objs.length}</div>${rows}`;
+    host.appendChild(card);
+  });
+  host.querySelectorAll(".obj").forEach(el=>{el.onclick=()=>{const s=jnyLoad("journey");s[el.dataset.k]=!s[el.dataset.k];jnySave("journey",s);renderJourney()}});
+  document.getElementById("jnyprog").style.width=(total?done/total*100:0)+"%";
+  document.getElementById("jnyprogtxt").textContent=`${done} / ${total} journey objectives complete`;
+}
+function renderConquests(){
+  const st=jnyLoad("conquests"),host=document.getElementById("jnyconquests");host.innerHTML="";let cd=0;
+  CONQUESTS.forEach((c,ci)=>{
+    const d=!!st[ci];if(d)cd++;const el=document.createElement("div");el.className="task"+(d?" done":"");
+    const easy=c.easy?' <span class="pill med">Easy</span>':'';
+    el.innerHTML=`<div class="chk"></div><div><div class="ttitle">${c.n}${easy} <span class="slot">· HC: ${c.hc}</span></div><div class="tdesc">${c.req}</div></div>`;
+    el.onclick=()=>{const s=jnyLoad("conquests");s[ci]=!s[ci];jnySave("conquests",s);renderConquests()};
+    host.appendChild(el);
+  });
+  const cc=document.getElementById("jnycqcount");cc.textContent=`${cd} / 10 done — Conqueror needs 2, Guardian needs 3`;
+  cc.style.color=cd>=3?"var(--gold2)":(cd>=2?"var(--gold)":"var(--muted)");
+}
+renderJourney();renderConquests();
+
+/* ============ TOOLS ============ */
+function calcShards(){
+  const s=+document.getElementById("shards").value||0,cost=+document.getElementById("slot").value;
+  const rolls=Math.floor(s/cost),leftover=s%cost,expLeg=(rolls*0.10).toFixed(1);
+  document.getElementById("shardout").innerHTML=`With <b>${s}</b> shards you get <b>${rolls}</b> gambles (<b>${leftover}</b> left over).<br>Roughly <b>~${expLeg}</b> legendaries expected (≈10% per gamble).`;
+}
+const CDR_SOURCES=[
+ {id:'helm',label:'Diamond in Helm (Flawless Royal · 12.5%)'},
+ {id:'leoric',label:"…doubled by Leoric's Crown (→ 25%)"},
+ {id:'wpn',label:'Weapon CDR roll (10%)',v:0.10},
+ {id:'sh',label:'Shoulders CDR (8%)',v:0.08},
+ {id:'gl',label:'Gloves CDR (8%)',v:0.08},
+ {id:'oh',label:'Off-hand / Source CDR (8%)',v:0.08},
+ {id:'am',label:'Amulet CDR (8%)',v:0.08},
+ {id:'r1',label:'Ring 1 CDR (8%)',v:0.08},
+ {id:'r2',label:'Ring 2 CDR (8%)',v:0.08},
+];
+function cdrChk(id){const e=document.getElementById('cdr_'+id);return e&&e.checked}
+function renderCDRSources(){document.getElementById('cdrsources').innerHTML=CDR_SOURCES.map(s=>`<label class="cdropt"><input type="checkbox" id="cdr_${s.id}" onchange="calcCDR()"> ${s.label}</label>`).join("")}
+function renderCDRPresets(){const ps=[["Long cooldown",120],["Medium",60],["Short",16]];document.getElementById('cdrpresets').innerHTML='Set base: '+ps.map(p=>`<button class="btn" style="padding:4px 9px;margin:2px" onclick="document.getElementById('cdrbase').value=${p[1]};calcCDR()">${p[0]} (${p[1]}s)</button>`).join('')}
+function calcCDR(){
+  let fr=[];if(cdrChk('helm'))fr.push(cdrChk('leoric')?0.25:0.125);
+  CDR_SOURCES.forEach(s=>{if(s.v&&cdrChk(s.id))fr.push(s.v)});
+  let para=Math.max(0,Math.min(10,+document.getElementById('cdrpara').value||0))/100;if(para)fr.push(para);
+  let cust=Math.max(0,+document.getElementById('cdrcustom').value||0)/100;if(cust)fr.push(cust);
+  let prod=1;fr.forEach(c=>prod*=(1-c));let combined=1-prod;
+  let base=+document.getElementById('cdrbase').value||0,red=base*(1-combined);
+  document.getElementById('cdrout').innerHTML=`Combined CDR: <b>${(combined*100).toFixed(1)}%</b> (multiplicative).<br>${base}s cooldown → <b>${red.toFixed(1)}s</b>.`;
+}
+function updateAugClass(){const c=CLASSES[curClassId()];document.getElementById('augclass').textContent='· '+c.mainStat+' → '+c.gemType}
+function calcAug(){
+  const c=CLASSES[curClassId()];let r=Math.max(1,+document.getElementById('augrank').value||1),stat=r*5;
+  document.getElementById('augout').innerHTML=`Rank ${r} augment = <b>+${stat}</b> ${c.mainStat} on one slot.<br>Recipe: 3 Flawless Royal ${c.gemType} + a rank-${r} Legendary Gem (consumed) on an Ancient/Primal item.<br>All 13 slots at rank ${r} = <b>+${stat*13}</b> ${c.mainStat}.`;
+}
+function gapOwnedKey(cId,bId){return 'd3master_owned_'+cId+'_'+bId}
+function renderGap(){
+  const cId=curClassId(),bId=curBuildId(cId),b=CLASSES[cId].builds[bId];
+  document.getElementById('gapbuild').textContent='· '+CLASSES[cId].name+' / '+b.name;
+  let st;try{st=JSON.parse(localStorage.getItem(gapOwnedKey(cId,bId)))||{}}catch(e){st={}}
+  const host=document.getElementById('gapitems');
+  host.innerHTML=b.legendaries.map((g,i)=>`<div class="obj${st[i]?' done':''}" data-i="${i}"><div class="ck"></div><span>${g[0]}${slotTxt(g[1])}</span></div>`).join('');
+  host.querySelectorAll('.obj').forEach(el=>{el.onclick=()=>{let s;try{s=JSON.parse(localStorage.getItem(gapOwnedKey(cId,bId)))||{}}catch(e){s={}}s[el.dataset.i]=!s[el.dataset.i];localStorage.setItem(gapOwnedKey(cId,bId),JSON.stringify(s));renderGap()}});
+  const owned=b.legendaries.filter((_,i)=>st[i]).length,tot=b.legendaries.length;
+  const missing=b.legendaries.filter((_,i)=>!st[i]).map(g=>g[0]);
+  let saved='';try{const gs=JSON.parse(localStorage.getItem('d3master_gapstats'))||{};const p=[];if(gs.cdr!=null)p.push(gs.cdr+'% CDR');if(gs.main!=null)p.push(gs.main+' main stat');if(p.length)saved=' · Your saved stats: '+p.join(' · ');}catch(e){}
+  document.getElementById('gapout').innerHTML=`You own <b>${owned}/${tot}</b> key items (${Math.round(owned/tot*100)}%).${missing.length?'<br>Still missing: '+missing.join(', '):' — full BiS legendaries! 🎉'}${saved}`;
+}
+function saveGapStats(){const cdr=document.getElementById('gapcdr').value,main=document.getElementById('gapmain').value;localStorage.setItem('d3master_gapstats',JSON.stringify({cdr:cdr===''?null:+cdr,main:main===''?null:+main}));renderGap()}
+
+/* ---- export / import / compare ---- */
+function lsObj(k){try{return JSON.parse(localStorage.getItem(k))||{}}catch(e){return {}}}
+function gatherAll(){
+  const o={v:1,kind:'master',class:curClassId(),build:{},tasks:{},owned:{},journey:lsObj(JNY_PREFIX+'journey'),conquests:lsObj(JNY_PREFIX+'conquests')};
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k)continue;
+    if(k.indexOf('d3master_build_')===0)o.build[k.slice(15)]=localStorage.getItem(k);
+    else if(k.indexOf('d3master_tasks_')===0)o.tasks[k.slice(15)]=lsObj(k);
+    else if(k.indexOf('d3master_owned_')===0)o.owned[k.slice(15)]=lsObj(k);
+  }
+  return o;
+}
+function countTrue(o){return Object.values(o||{}).filter(Boolean).length}
+function exportCode(){
+  const code=btoa(encodeURIComponent(JSON.stringify(gatherAll())));
+  document.getElementById('impout').innerHTML='<div class="slot" style="margin-bottom:4px">Your code (select &amp; copy if needed):</div><textarea readonly style="width:100%;min-height:60px;background:#120c08;border:1px solid var(--line);color:var(--gold2);border-radius:6px;padding:8px;font-size:11px">'+code+'</textarea>';
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(()=>{document.getElementById('expmsg').textContent='Copied to clipboard!'}).catch(()=>{document.getElementById('expmsg').textContent='Select the code below & copy.'})}else{document.getElementById('expmsg').textContent='Select the code below & copy.'}
+}
+function parseImport(){const s=document.getElementById('impcode').value.trim();if(!s)throw'empty';return JSON.parse(decodeURIComponent(atob(s)))}
+function importCode(){
+  let p;try{p=parseImport()}catch(e){document.getElementById('impout').textContent='Invalid or empty code.';return}
+  if(!confirm('Replace YOUR saved progress with this code? (Journey, conquests, all class builds & checklists)'))return;
+  localStorage.setItem(JNY_PREFIX+'journey',JSON.stringify(p.journey||{}));
+  localStorage.setItem(JNY_PREFIX+'conquests',JSON.stringify(p.conquests||{}));
+  if(p.class)localStorage.setItem('d3master_class',p.class);
+  if(p.build)Object.keys(p.build).forEach(k=>localStorage.setItem('d3master_build_'+k,p.build[k]));
+  if(p.tasks)Object.keys(p.tasks).forEach(k=>localStorage.setItem('d3master_tasks_'+k,JSON.stringify(p.tasks[k])));
+  if(p.owned)Object.keys(p.owned).forEach(k=>localStorage.setItem('d3master_owned_'+k,JSON.stringify(p.owned[k])));
+  location.reload();
+}
+function compareCode(){
+  let p;try{p=parseImport()}catch(e){document.getElementById('impout').textContent='Invalid or empty code.';return}
+  const mine=gatherAll(),totObj=JOURNEY.reduce((a,t)=>a+t.objs.length,0);
+  const myJ=countTrue(mine.journey),thJ=countTrue(p.journey),myC=countTrue(mine.conquests),thC=countTrue(p.conquests);
+  const perTier=JOURNEY.map((t,ti)=>{const m=Object.keys(mine.journey||{}).filter(k=>k.indexOf(ti+'-')===0&&mine.journey[k]).length;const th=Object.keys(p.journey||{}).filter(k=>k.indexOf(ti+'-')===0&&p.journey[k]).length;return `${t.tier}: you ${m}/${t.objs.length} · them ${th}/${t.objs.length}`}).join('<br>');
+  document.getElementById('impout').innerHTML=`<b>Journey:</b> you <b>${myJ}/${totObj}</b> · them <b>${thJ}/${totObj}</b><br><b>Conquests:</b> you ${myC}/10 · them ${thC}/10<br><br>${perTier}`;
+}
+
+/* ---- tab switching ---- */
+document.querySelectorAll(".tab").forEach(t=>{t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");document.getElementById(t.dataset.view).classList.add("active");
+}});
+
+/* ---- SFX (WebAudio ding) ---- */
+let SFX=localStorage.getItem('d3master_sfx')!=='off',_ac;
+function updateSfxBtn(){document.getElementById('sfxbtn').textContent=SFX?'🔊 SFX':'🔇 SFX'}
+function toggleSfx(){SFX=!SFX;localStorage.setItem('d3master_sfx',SFX?'on':'off');updateSfxBtn();if(SFX)ding()}
+function ding(){if(!SFX)return;try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();const t=_ac.currentTime;[[880,0],[1320,0.08]].forEach(p=>{const o=_ac.createOscillator(),g=_ac.createGain();o.type='sine';o.frequency.value=p[0];o.connect(g);g.connect(_ac.destination);g.gain.setValueAtTime(0.0001,t+p[1]);g.gain.exponentialRampToValueAtTime(0.12,t+p[1]+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+p[1]+0.22);o.start(t+p[1]);o.stop(t+p[1]+0.24)})}catch(e){}}
+
+/* ---- floating embers ---- */
+(function embers(){const host=document.getElementById('embers');if(!host)return;for(let i=0;i<22;i++){const e=document.createElement('div');e.className='ember';e.style.left=(i*4.6+Math.random()*4)+'%';const dur=9+Math.random()*10;e.style.animationDuration=dur+'s';e.style.animationDelay=(-Math.random()*dur)+'s';const sz=2+Math.random()*4;e.style.width=e.style.height=sz+'px';host.appendChild(e)}})();
+
+/* ---- season countdown (est. end ~late Sep 2026) ---- */
+(function countdown(){const end=new Date(2026,8,27,17,0,0),now=new Date();const days=Math.max(0,Math.ceil((end-now)/86400000));document.getElementById('countdown').innerHTML=days>0?`Season 39 · <b>~${days} days</b> left (est.)`:'Season 39 has ended';})();
+
+/* ---- tools init ---- */
+renderCDRSources();renderCDRPresets();updateAugClass();calcShards();calcCDR();calcAug();renderGap();updateSfxBtn();
+try{const gs=JSON.parse(localStorage.getItem('d3master_gapstats'))||{};if(gs.cdr!=null)document.getElementById('gapcdr').value=gs.cdr;if(gs.main!=null)document.getElementById('gapmain').value=gs.main;}catch(e){}
+</script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}</script>
+</body>
+</html>

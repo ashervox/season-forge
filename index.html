@@ -224,10 +224,17 @@
         </div>
         <div>
           <div class="sub">Key Legendaries</div><ul class="gear" id="glegendaries"></ul>
-          <div class="sub">Kanai's Cube</div><ul class="gear" id="gcube"></ul>
+          <div class="sub">Kanai's Cube <span class="info" tabindex="0" data-tip="Season 39's theme gives Kanai's Cube a bonus 4th slot. It can hold ANY power — weapon, armor, or jewelry — but it will not stack if you duplicate a power you already have cubed or equipped.">?</span></div>
+          <ul class="gear" id="gcube"></ul>
+          <div class="tdesc" id="gcube4" style="margin-top:2px"></div>
           <div class="sub">Legendary Gems</div><ul class="gear" id="ggems"></ul>
         </div>
       </div>
+    </div>
+    <div class="card full">
+      <h2>🌑 Shadow Clone <span class="info" tabindex="0" data-tip="Season 39's theme: activating a Shrine or Pylon spawns a shadow clone of your class for 60 seconds, scaled to your power. It randomly uses 1 of 3 fixed 6-skill loadouts (no passives, no gear/set bonuses) — only the base skill + rune matters.">?</span></h2>
+      <div class="tdesc" id="shadowIntro" style="margin-bottom:10px"></div>
+      <div class="grid" style="gap:12px" id="shadowClones"></div>
     </div>
     <div class="card full">
       <h2>Upgrade Checklist <button class="btn" onclick="resetGuide()" style="float:right">Reset</button></h2>
@@ -368,6 +375,60 @@
 <script>
 /* ============ DATA ============ */
 const ORDER=["barbarian","crusader","demonhunter","monk","witchdoctor","wizard","necromancer"];
+
+/* Season 39 theme: bonus 4th Kanai's Cube slot — ANY power (weapon/armor/jewelry), doesn't stack with a duplicate you already have equipped/cubed. */
+const CUBE4_RULE="This slot accepts ANY power — weapon, armor, or jewelry. It will NOT stack if you duplicate a power already equipped or cubed elsewhere, so pick something new.";
+const CUBE4={
+ "barbarian/ww":["Obsidian Ring of the Zodiac","extra cooldown reduction for more Wrath of the Berserker uptime"],
+ "barbarian/lodhota":["Nemesis Bracers","free extra Rift Guardian/elite kills to keep momentum on GR pushes"],
+ "crusader/roland":["Obsidian Ring of the Zodiac","more cooldown reduction to keep Akarat's Champion & Laws up"],
+ "crusader/akkhan":["Nemesis Bracers","summons an extra elite pack — more Condemn fuel"],
+ "crusader/aov":["Focus & Restraint","free damage/toughness pair since a ring slot is already used elsewhere"],
+ "crusader/invoker":["The Compass Rose","XP/DMG scaling as Nephalem Glory stacks build up"],
+ "demonhunter/ue":["Focus & Restraint","free damage/toughness pair that doesn't cost a ring slot"],
+ "monk/poj":["Obsidian Ring of the Zodiac","more CDR for Epiphany/Mantra uptime"],
+ "monk/raiment":["Focus & Restraint","free damage/toughness while keeping both real rings"],
+ "witchdoctor/helltooth":["Nemesis Bracers","extra elite/GR pack density for Gargantuan uptime"],
+ "witchdoctor/mundunugu":["Focus & Restraint","free damage/toughness pairing since rings are already spoken for"],
+ "wizard/talrasha":["Obsidian Ring of the Zodiac","more CDR so Meteor/Black Hole come off cooldown faster"],
+ "wizard/typhon":["Nemesis Bracers","extra elites feed more Hydra/Blizzard uptime"],
+ "necromancer/rathma":["Nemesis Bracers","extra elite pack = more Command Skeletons/Revive fodder"],
+ "necromancer/masq":["Obsidian Ring of the Zodiac","more CDR for Simulacrum/Bone Armor uptime"],
+ "necromancer/rat":["Focus & Restraint","free damage/toughness pairing alongside your LoD ancients"],
+};
+
+/* Season 39 theme: Shrine/Pylon spawns a shadow clone of your class (60s, scaled to you) using 1 of 3 fixed skill-only loadouts (no passives/gear). Data = Season 22 rerun (identical mechanic). */
+const SHADOW_CLONES={
+ barbarian:[
+  {name:"Seismic Slam / Avalanche",skills:"Seismic Slam-Rumble, Battle Rage-Marauder's Rage, Threatening Shout-Falter, Avalanche-Volcano, Wrath of the Berserker-Insanity, Leap-Launch"},
+  {name:"Earthquake / Whirlwind",skills:"Earthquake-Molten Fury, Sprint-Run Like the Wind, Wrath of the Berserker-Insanity, Whirlwind-Dust Devils, Bash-Pulverize, Ancient Spear-Boulder Toss"},
+  {name:"Rend / Hammer",skills:"Rend-Lacerate, Hammer of the Ancients-Rolling Thunder, Battle Rage-Ferocity, Threatening Shout-Falter, Wrath of the Berserker-Insanity, Leap-Launch"}],
+ crusader:[
+  {name:"Sweep / Heaven's Fury",skills:"Akarat's Champion-Fire Starter, Falling Sword-Superheated, Iron Skin-Flash, Sweep Attack-Blazing Sweep, Blessed Shield-Shattering Throw, Heaven's Fury-Split Fury"},
+  {name:"Consecration / FoH",skills:"Akarat's Champion-Hasteful, Falling Sword-Rapid Descent, Consecration-Shattered Ground, Consecration-Bathed in Light, Fist of the Heavens-Retribution, Bombardment-Annihilate"},
+  {name:"Condemn bomber",skills:"Akarat's Champion-Rally, Blessed Hammer-Limitless, Iron Skin-Explosive Skin, Condemn-Reciprocate, Condemn-Unleashed, Condemn-Shattering Explosion"}],
+ demonhunter:[
+  {name:"Cluster / Chakram",skills:"Marked for Death-Valley of Death, Caltrops-Jagged Spikes, Rain of Vengeance-Dark Cloud, Fan of Knives-Assassin's Knives, Cluster Arrow-Shooting Stars, Chakram-Twin Chakrams"},
+  {name:"Multishot / Impale",skills:"Marked for Death-Valley of Death, Rain of Vengeance-Shade, Cluster Arrow-Maelstrom, Multishot-Arsenal, Impale-Overpenetration, Vengeance-Side Cannons"},
+  {name:"Elemental Arrow",skills:"Marked for Death-Valley of Death, Vengeance-Personal Mortar, Chakram-Serpentine, Impale-Ricochet, Elemental Arrow-Immolation Arrow, Elemental Arrow-Frost Arrow"}],
+ monk:[
+  {name:"Exploding Palm / 7SS",skills:"Lashing Tail Kick-Sweeping Armada, Fists of Thunder-Static Charge, Exploding Palm-Essence Burn, Seven-Sided Strike-Fulminating Onslaught, Way of the Hundred Fists-Hands of Lightning, Seven-Sided Strike-Sudden Assault"},
+  {name:"Sanctuary / Sweeping Wind",skills:"Inner Sanctuary-Intervene, Crippling Wave-Concussion, Lashing Tail Kick-Spinning Flame Kick, Epiphany-Soothing Mist, Seven-Sided Strike-Incinerate, Sweeping Wind-Fire Storm"},
+  {name:"Wave of Light",skills:"Breath of Heaven-Circle of Scorn, Wave of Light-Pillar of the Ancients, Wave of Light-Explosive Light, Wave of Light-Empowered Wave, Sweeping Wind-Cyclone, Epiphany-Inner Fire"}],
+ witchdoctor:[
+  {name:"Haunt / Piranhas",skills:"Grasp of the Dead-Rain of Corpses, Wall of Death-Fire Wall, Haunt-Poisoned Spirit, Piranhas-Zombie Piranhas, Firebomb-Flash Fire, Spirit Barrage-The Spirit is Willing"},
+  {name:"Zombie Bears",skills:"Zombie Charger-Zombie Bears, Acid Cloud-Acid Rain, Wall of Death-Communing with Spirits, Corpse Spiders-Medusa Spiders, Piranhas-Zombie Piranhas, Locust Swarm-Diseased Swarm"},
+  {name:"Acid Cloud / Spirit Barrage",skills:"Zombie Charger-Explosive Beast, Acid Cloud-Slow Burn, Acid Cloud-Kiss of Death, Spirit Barrage-Well of Souls, Grasp of the Dead-Unbreakable Grasp, (varies)"}],
+ wizard:[
+  {name:"Arcane Orb",skills:"Arcane Orb-Frozen Orb, Meteor-Molten Impact, Frost Nova-Frozen Mist, Arcane Orb-Obliteration, Arcane Orb-Scorch, Disintegrate-Volatility"},
+  {name:"Blizzard / Twister",skills:"Blizzard-Unrelenting Storm, Explosive Blast-Short Fuse, Wave of Force-Debilitating Force, Energy Twister-Raging Storm, Blizzard-Apocalypse, Slow Time-Exhaustion"},
+  {name:"Explosive Blast",skills:"Explosive Blast-Obliterate, Wave of Force-Heat Wave, Energy Twister-Raging Storm, Ray of Frost-Black Ice, Disintegrate-Convergence, Meteor-Star Pact"}],
+ necromancer:[
+  {name:"Corpse Lance",skills:"Land of the Dead-Plaguelands, Frailty-Early Grave, Army of the Dead-Dead Storm, Corpse Lance-Blood Lance, Corpse Explosion-Final Embrace, Corpse Lance-Ricochet"},
+  {name:"Bone Spear",skills:"Land of the Dead-Plaguelands, Frailty-Early Grave, Army of the Dead-Blighted Grasp, Bone Spear-Shatter, Bone Spear-Blood Spear, Bone Spear-Blighted Marrow"},
+  {name:"Death Nova",skills:"Land of the Dead-Plaguelands, Frailty-Early Grave, Death Nova-Bone Nova, Death Nova-Blood Nova, Death Nova-Blight, (varies)"}],
+};
+
 const CLASSES={
  barbarian:{name:"Barbarian",mainStat:"Strength",gemType:"Ruby",freeSet:"Wrath of the Wastes",
   leveling:["Whirlwind + Rend (or Frenzy) to blast packs","Sprint / Furious Charge to move","Gem of Ease in your weapon to power-level","Grab Ring of Royal Grandeur from Act I caches"],
@@ -612,6 +673,12 @@ function renderParagon(cId,c,bId){
   document.getElementById('pgnGrid').innerHTML=cats.map(x=>`<div class="pgncat"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("");
   document.getElementById('pgnTip').textContent=PGN_TIP[bId]?('· Tip: '+PGN_TIP[bId]):'';
 }
+const SHADOW_WORTH={barbarian:"Decent burst filler — none outclass your main rotation, but free damage during the 60s window is still free damage.",crusader:"The Condemn variation hits hardest; all three are safe to just let ride while you keep playing your own build.",demonhunter:"All three lean AoE/burst — worth actively grabbing Shrines/Pylons on packs since DH clones hit well above their own gear.",monk:"Wave of Light variation has the biggest single hits; still a bonus, not a build to build around.",witchdoctor:"Zombie Bears variation is the standout — strong enough that some players path toward Pylons/Shrines just to proc it.",wizard:"Blizzard/Twister variation covers the most ground; all 3 are safe passive value adds.",necromancer:"Bone Spear variation is the cleanest single-target; Corpse Lance covers more area — either is a solid bonus."};
+function renderShadowClones(cId){
+  document.getElementById('shadowIntro').innerHTML='Activating a <b>Shrine or Pylon</b> summons a shadow clone of your class for <b>60 seconds</b>, scaled to your character\'s power. It randomly rolls <b>1 of these 3</b> fixed skill loadouts (no passives, no gear/set bonuses — just base skill + rune). <b>Worth chasing?</b> '+(SHADOW_WORTH[cId]||'');
+  const arr=SHADOW_CLONES[cId]||[];
+  document.getElementById('shadowClones').innerHTML=arr.map((v,i)=>'<div class="pgncat"><b>Variation '+(i+1)+' — '+v.name+'</b><span>'+v.skills+'</span></div>').join('');
+}
 
 /* ============ TASK GENERATION ============ */
 function makeTasks(cId,c,bId,b){
@@ -676,8 +743,11 @@ function renderGuide(){
   document.getElementById('gpassives').innerHTML=b.passives.map(p=>li(p)).join("");
   document.getElementById('glegendaries').innerHTML=b.legendaries.map(g=>li('<span class="leg">'+g[0]+'</span>'+slotTxt(g[1]))).join("");
   document.getElementById('gcube').innerHTML=b.cube.map(g=>li('<span class="leg">'+g[0]+'</span>'+slotTxt(g[1]))).join("");
+  const c4=CUBE4[cId+'/'+bId];
+  document.getElementById('gcube4').innerHTML=c4?('<b style="color:var(--gold2)">Slot 4 (any):</b> <span class="leg">'+c4[0]+'</span> — '+c4[1]+'.'):'';
   document.getElementById('ggems').innerHTML=b.gems.map(g=>li('<span class="setc">'+g+'</span>')).join("");
   renderParagon(cId,c,bId);
+  renderShadowClones(cId);
   renderTasks(cId,bId,makeTasks(cId,c,bId,b));
   // tools that depend on selection
   if(document.getElementById('augclass'))updateAugClass();
@@ -951,7 +1021,7 @@ function renderPaperdoll(){
 let LAB=null,_modalCb=null;
 function labLoad(){try{return JSON.parse(localStorage.getItem('d3master_lab'))}catch(e){return null}}
 function labSave(){localStorage.setItem('d3master_lab',JSON.stringify(LAB))}
-function labDefault(){return {cls:'barbarian',gender:'male',gear:{},gems:[null,null,null],cube:{weapon:null,armor:null,jewelry:null},skills:[null,null,null,null,null,null],passives:[null,null,null,null]}}
+function labDefault(){return {cls:'barbarian',gender:'male',gear:{},gems:[null,null,null],cube:{weapon:null,armor:null,jewelry:null,slot4:null},skills:[null,null,null,null,null,null],passives:[null,null,null,null]}}
 function poolKey(slot){return slot==='ring1'||slot==='ring2'?'ring':slot}
 function equippedNames(){const g=Object.values(LAB.gear).filter(Boolean);return g.concat(LAB.gems.filter(Boolean)).concat(Object.values(LAB.cube).filter(Boolean))}
 function openModal(title,opts,cb){_modalCb=cb;document.getElementById('modaltitle').textContent=title;document.getElementById('modalsearch').value='';const host=document.getElementById('modalopts');host.innerHTML='';opts.forEach(o=>{const b=document.createElement('button');b.className='opt'+(o.q?' q-'+o.q:'');b.innerHTML=(o.icon?'<img src="'+o.icon+'" alt="">':'')+o.label+(o.sub?' <small>'+o.sub+'</small>':'');b.onclick=()=>{closeModal();cb(o.value)};host.appendChild(b)});document.getElementById('labmodal').classList.add('open');setTimeout(()=>document.getElementById('modalsearch').focus(),30)}
@@ -968,6 +1038,10 @@ function renderLab(){
   const gc=document.getElementById('labgemcube');gc.innerHTML='';
   [0,1,2].forEach(i=>{const it=LAB.gems[i];const el=document.createElement('div');el.className='slot2';el.innerHTML='<div class="sl">Legendary Gem '+(i+1)+'</div><div class="it gemc'+(it?'':' empty')+'">'+(it||'— empty —')+'</div>';el.onclick=()=>openModal('Legendary Gem',clearFirst(P.gems),v=>{LAB.gems[i]=v;labSave();renderLab()});gc.appendChild(el)});
   [['weapon','Cube · Weapon'],['armor','Cube · Armor'],['jewelry','Cube · Jewelry']].forEach(([k,label])=>{const it=LAB.cube[k];const el=document.createElement('div');el.className='slot2';el.innerHTML='<div class="sl">'+label+'</div><div class="it'+(it?'':' empty')+'">'+(it||'— empty —')+'</div>';el.onclick=()=>openModal(label,clearFirst(P.cube[k]),v=>{LAB.cube[k]=v;labSave();renderLab()});gc.appendChild(el)});
+  const c4pool=[...new Set([...P.cube.weapon,...P.cube.armor,...P.cube.jewelry])];
+  const c4it=LAB.cube.slot4;const c4el=document.createElement('div');c4el.className='slot2';c4el.title="Season 39: bonus 4th slot — any power, won't stack with a duplicate";
+  c4el.innerHTML='<div class="sl">Cube · Slot 4 (any) 🌟</div><div class="it'+(c4it?'':' empty')+'">'+(c4it||'— empty —')+'</div>';
+  c4el.onclick=()=>openModal('Cube Slot 4 — any power (no dupes)',clearFirst(c4pool),v=>{LAB.cube.slot4=v;labSave();renderLab()});gc.appendChild(c4el);
   // skills
   const sk=document.getElementById('labskills');sk.innerHTML='';
   for(let i=0;i<6;i++){const s=LAB.skills[i];const el=document.createElement('div');el.className='slot2';el.innerHTML='<div class="sl">Skill '+(i+1)+'</div><div class="it skl'+(s?'':' empty')+'">'+(s?s.skill+(s.rune?' — '+s.rune:''):'— empty —')+'</div>';el.onclick=()=>pickSkill(i,P);sk.appendChild(el)}

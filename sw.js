@@ -1,5 +1,5 @@
 /* Service worker — offline support with fresh-when-online updates */
-const CACHE = 'd3-s39-guide-v9';
+const CACHE = 'd3-s39-guide-v10';
 const ASSETS = ['.', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon-180.png'];
 
 self.addEventListener('install', e => {

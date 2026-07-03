@@ -916,19 +916,24 @@ const PD_LEFT=['helm','shoulders','amulet','chest','gloves'],PD_RIGHT=['bracers'
 const SLOTLABEL={weapon:'Weapon',offhand:'Off-Hand',helm:'Helm',shoulders:'Shldr',amulet:'Amulet',chest:'Chest',gloves:'Gloves',bracers:'Bracers',belt:'Belt',pants:'Pants',boots:'Boots',ring1:'Ring',ring2:'Ring'};
 function labFigure(cls,gender){
   const t=THEMES[cls]||THEMES.crusader,c=t[0],c2=t[1],female=gender==='female',sw=female?24:30;
+  const robe=(cls==='wizard'||cls==='necromancer'||cls==='witchdoctor'),eye=cls==='necromancer'?'#d9d2c0':c2;
   const hair=female?'<path d="M67 34 q-7 24 0 42 M93 34 q7 24 0 42" stroke="'+c2+'" stroke-width="5" fill="none" opacity=".7"/>':'';
+  const cape=(cls==='demonhunter'||robe)?'<path d="M'+(80-sw+4)+' 66 L'+(80-sw-4)+' 250 L80 236 L'+(80+sw+4)+' 250 L'+(80+sw-4)+' 66 Z" fill="#0f0b08" stroke="'+c+'" stroke-width="1.5" opacity=".7"/>':'';
+  const lower=robe
+    ?'<path d="M'+(80-sw+12)+' 150 L'+(80+sw-12)+' 150 L'+(80+sw+8)+' 270 L'+(80-sw-8)+' 270 Z" fill="#15110c" stroke="'+c+'" stroke-width="2.5"/><path d="M80 156 L80 264" stroke="'+c2+'" stroke-width="1.5" opacity=".35"/><path d="M62 270 L79 270 L81 282 L60 282 Z" fill="#1c1611" stroke="'+c+'" stroke-width="2"/><path d="M98 270 L81 270 L79 282 L100 282 Z" fill="#1c1611" stroke="'+c+'" stroke-width="2"/>'
+    :'<path d="M72 150 L66 250 L75 268 L80 250 Z" fill="#15110c" stroke="'+c+'" stroke-width="2"/><path d="M88 150 L94 250 L85 268 L80 250 Z" fill="#15110c" stroke="'+c+'" stroke-width="2"/><path d="M60 262 L79 262 L81 279 L58 279 Z" fill="#1c1611" stroke="'+c+'" stroke-width="2"/><path d="M100 262 L81 262 L79 279 L102 279 Z" fill="#1c1611" stroke="'+c+'" stroke-width="2"/>';
   return '<svg viewBox="0 0 160 300" xmlns="http://www.w3.org/2000/svg">'
-   +'<g opacity=".5" transform="translate(20,64) scale(0.6)">'+weaponGlyph(cls,c2)+'</g>'
-   +'<path d="M72 150 L66 250 L75 268 L80 250 Z" fill="#15110c" stroke="'+c+'" stroke-width="2"/><path d="M88 150 L94 250 L85 268 L80 250 Z" fill="#15110c" stroke="'+c+'" stroke-width="2"/>'
-   +'<path d="M60 262 L79 262 L81 279 L58 279 Z" fill="#1c1611" stroke="'+c+'" stroke-width="2"/><path d="M100 262 L81 262 L79 279 L102 279 Z" fill="#1c1611" stroke="'+c+'" stroke-width="2"/>'
+   +cape
+   +'<g opacity=".55" transform="translate(96,150) scale(0.5)">'+weaponGlyph(cls,c2)+'</g>'
+   +lower
    +'<path d="M'+(80-sw)+' 64 L'+(80-sw-8)+' 140 L'+(80-sw+2)+' 150 L'+(80-sw+12)+' 80 Z" fill="#17120d" stroke="'+c+'" stroke-width="2"/><path d="M'+(80+sw)+' 64 L'+(80+sw+8)+' 140 L'+(80+sw-2)+' 150 L'+(80+sw-12)+' 80 Z" fill="#17120d" stroke="'+c+'" stroke-width="2"/>'
    +'<path d="M'+(80-sw+6)+' 66 L'+(80+sw-6)+' 66 L'+(80+sw-14)+' 152 L'+(80-sw+14)+' 152 Z" fill="#14100c" stroke="'+c+'" stroke-width="2.5"/><path d="M80 70 L80 148" stroke="'+c2+'" stroke-width="1.5" opacity=".4"/>'
    +'<ellipse cx="'+(80-sw+2)+'" cy="68" rx="13" ry="10" fill="'+c+'"/><ellipse cx="'+(80+sw-2)+'" cy="68" rx="13" ry="10" fill="'+c+'"/>'
    +'<rect x="'+(80-sw+12)+'" y="146" width="'+((sw-12)*2)+'" height="9" fill="'+c+'" opacity=".85"/>'
    +'<rect x="74" y="46" width="12" height="12" fill="#1a1512"/>'+hair
    +'<circle cx="80" cy="36" r="14" fill="#1c1611" stroke="'+c+'" stroke-width="2.5"/>'
-   +'<path d="M66 38 Q80 16 94 38 Q94 27 80 24 Q66 27 66 38 Z" fill="'+c+'" opacity=".9"/>'
-   +'<circle cx="75" cy="38" r="2" fill="'+c2+'"/><circle cx="85" cy="38" r="2" fill="'+c2+'"/>'
+   +'<g transform="translate(28,-19.1) scale(0.52)">'+helmShape(CLASS_ART[cls]?CLASS_ART[cls].helm:'hood',c,c2)+'</g>'
+   +'<circle cx="75" cy="38" r="2" fill="'+eye+'"/><circle cx="85" cy="38" r="2" fill="'+eye+'"/>'
    +'</svg>';
 }
 function pdSlotEl(key){

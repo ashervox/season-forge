@@ -94,6 +94,10 @@
   .calc input,.calc select{background:#120c08;border:1px solid var(--line);color:var(--gold2);padding:9px 11px;border-radius:6px;font-size:14px;width:150px}
   .calcout{margin-top:14px;font-size:14px;line-height:1.7}.calcout b{color:var(--gold2);font-size:17px}
   .cdropt{display:block;font-size:12.5px;color:var(--txt);padding:4px 0;cursor:pointer}.cdropt input{margin-right:7px;accent-color:var(--gold)}
+  .info{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1px solid var(--muted);color:var(--muted);border-radius:50%;font-size:11px;font-weight:700;margin-left:8px;cursor:help;position:relative;vertical-align:middle;flex:none}
+  .info:hover,.info:focus{color:var(--gold);border-color:var(--gold);outline:none}
+  .info::after{content:attr(data-tip);position:absolute;top:135%;left:50%;transform:translateX(-50%);width:250px;max-width:72vw;background:#12100c;border:1px solid var(--gold);color:var(--txt);font-size:12px;font-weight:400;line-height:1.5;letter-spacing:0;text-transform:none;padding:9px 11px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.55);opacity:0;visibility:hidden;transition:opacity .15s;z-index:30;text-align:left;pointer-events:none}
+  .info:hover::after,.info:focus::after{opacity:1;visibility:visible}
   textarea{font-family:monospace}
   footer{text-align:center;color:#5c4d3a;font-size:11px;padding:24px;letter-spacing:1px;border-top:1px solid var(--line)}
   .countdown{display:inline-block;margin-top:9px;font-size:12px;letter-spacing:1px;color:var(--gold2);background:rgba(201,162,75,.1);border:1px solid var(--line);border-radius:20px;padding:5px 14px}
@@ -205,7 +209,7 @@
 <div class="view" id="tools">
   <div class="grid">
     <div class="card full">
-      <h2>Kadala Blood Shard Calculator</h2>
+      <h2>Kadala Blood Shard Calculator <span class="info" tabindex="0" data-tip="Estimates how many Kadala gambles your Blood Shards buy and roughly how many legendaries to expect. Cheaper slots = more gambles per shard.">?</span></h2>
       <div class="calc">
         <div><label>Blood shards available</label><input type="number" id="shards" value="500" min="0" oninput="calcShards()"></div>
         <div><label>Gamble slot</label><select id="slot" onchange="calcShards()">
@@ -218,7 +222,7 @@
       <div class="calcout" id="shardout"></div>
     </div>
     <div class="card">
-      <h2>Cooldown Reduction Calculator</h2>
+      <h2>Cooldown Reduction Calculator <span class="info" tabindex="0" data-tip="CDR sources stack multiplicatively, not additively. Tick your sources to see your true total CDR% and how short a skill's cooldown becomes.">?</span></h2>
       <div id="cdrsources"></div>
       <div class="calc" style="margin-top:10px">
         <div><label>Paragon CDR % (0–10)</label><input type="number" id="cdrpara" value="0" min="0" max="10" step="0.2" oninput="calcCDR()"></div>
@@ -229,7 +233,7 @@
       <div class="calcout" id="cdrout"></div>
     </div>
     <div class="card">
-      <h2>Augment Calculator <span class="slot" id="augclass"></span></h2>
+      <h2>Augment Calculator <span class="info" tabindex="0" data-tip="Caldesann's Despair: augmenting an Ancient/Primal item gives main stat = gem rank × 5. Shows the bonus and the mats needed (3 Flawless Royal gems + a leveled Legendary Gem).">?</span> <span class="slot" id="augclass"></span></h2>
       <div class="calc">
         <div><label>Legendary gem rank</label><input type="number" id="augrank" value="100" min="1" oninput="calcAug()"></div>
         <button class="btn" onclick="calcAug()">Calculate</button>
@@ -237,7 +241,7 @@
       <div class="calcout" id="augout"></div>
     </div>
     <div class="card full">
-      <h2>Character Check — Gap Analysis <span class="slot" id="gapbuild"></span></h2>
+      <h2>Character Check — Gap Analysis <span class="info" tabindex="0" data-tip="Tick the best-in-slot items you already own for your selected build to see your completion % and exactly which pieces are left to farm.">?</span> <span class="slot" id="gapbuild"></span></h2>
       <div class="howbox">Tick the BiS items you own for your <b>selected class & build</b> (set them on the Build Guide tab). <i>True one-click Blizzard armory import can't run from a local file — the API needs an OAuth token and blocks browser access — so this is the offline equivalent.</i></div>
       <div class="calc" style="margin-bottom:10px">
         <div><label>Your current CDR %</label><input type="number" id="gapcdr" min="0" max="80"></div>
@@ -248,7 +252,7 @@
       <div class="calcout" id="gapout"></div>
     </div>
     <div class="card full">
-      <h2>Export / Import Progress</h2>
+      <h2>Export / Import Progress <span class="info" tabindex="0" data-tip="Saves all your progress (build checklists + Season Journey) into a code you can move to another device. Paste a friend's code and hit Compare to see your Journeys side by side without overwriting yours.">?</span></h2>
       <div class="howbox">Copy your <b>progress code</b> to move between PCs — or paste someone else's code and hit <b>Compare</b> to see Journey progress side by side. <b>Compare</b> never changes your data; <b>Load</b> replaces it.</div>
       <div style="margin-bottom:8px"><button class="btn" onclick="exportCode()">Copy my progress code</button> <span id="expmsg" class="slot"></span></div>
       <textarea id="impcode" placeholder="Paste a progress code here…" style="width:100%;min-height:64px;background:#120c08;border:1px solid var(--line);color:var(--gold2);border-radius:6px;padding:9px;font-size:12px"></textarea>
@@ -256,7 +260,7 @@
       <div class="calcout" id="impout"></div>
     </div>
     <div class="card full">
-      <h2>Season 39 Haedrig's Gift Path</h2>
+      <h2>Season 39 Haedrig's Gift Path <span class="info" tabindex="0" data-tip="Your free class set: finish Season Journey Chapters 2, 3 and 4 (Chapter 4 needs a solo Greater Rift 20) to receive all 6 set pieces in three gift bags.">?</span></h2>
       <div class="tdesc" style="font-size:13.5px;line-height:1.7">
         Completing Season Journey <b>Chapters 2, 3 and 4</b> grants your class's full free 6-piece set in three gift bags
         (Chapter 4 requires a solo <b>GR20</b>). Make sure your <b>seasonal</b> hero completes the chapters. Builds that use a

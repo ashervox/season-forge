@@ -1,5 +1,5 @@
 /* Service worker — offline cache for the Master Guide PWA */
-const CACHE = 'd3-s39-guide-v2';
+const CACHE = 'd3-s39-guide-v3';
 const ASSETS = ['.', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon-180.png'];
 
 self.addEventListener('install', e => {

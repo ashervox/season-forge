@@ -778,7 +778,7 @@ function saveGapStats(){const cdr=document.getElementById('gapcdr').value,main=d
 /* ---- export / import / compare ---- */
 function lsObj(k){try{return JSON.parse(localStorage.getItem(k))||{}}catch(e){return {}}}
 function gatherAll(){
-  const o={v:1,kind:'master',class:curClassId(),build:{},tasks:{},owned:{},journey:lsObj(JNY_PREFIX+'journey'),conquests:lsObj(JNY_PREFIX+'conquests')};
+  const o={v:1,kind:'master',class:curClassId(),build:{},tasks:{},owned:{},journey:lsObj(JNY_PREFIX+'journey'),conquests:lsObj(JNY_PREFIX+'conquests'),lab:(typeof LAB!=='undefined'&&LAB)?LAB:null};
   for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k)continue;
     if(k.indexOf('d3master_build_')===0)o.build[k.slice(15)]=localStorage.getItem(k);
     else if(k.indexOf('d3master_tasks_')===0)o.tasks[k.slice(15)]=lsObj(k);
@@ -802,6 +802,7 @@ function importCode(){
   if(p.build)Object.keys(p.build).forEach(k=>localStorage.setItem('d3master_build_'+k,p.build[k]));
   if(p.tasks)Object.keys(p.tasks).forEach(k=>localStorage.setItem('d3master_tasks_'+k,JSON.stringify(p.tasks[k])));
   if(p.owned)Object.keys(p.owned).forEach(k=>localStorage.setItem('d3master_owned_'+k,JSON.stringify(p.owned[k])));
+  if(p.lab)localStorage.setItem('d3master_lab',JSON.stringify(p.lab));
   location.reload();
 }
 function compareCode(){
@@ -815,7 +816,19 @@ function compareCode(){
 /* ============ BUILD LAB ============ */
 const SLOTS=[["weapon","Weapon"],["offhand","Off-Hand"],["helm","Helm"],["shoulders","Shoulders"],["amulet","Amulet"],["chest","Chest"],["gloves","Gloves"],["bracers","Bracers"],["belt","Belt"],["pants","Pants"],["boots","Boots"],["ring1","Ring 1"],["ring2","Ring 2"]];
 const SLOTMAP={weapon:"weapon",offhand:"offhand",shield:"offhand",quiver:"offhand",mojo:"offhand",source:"offhand",bracers:"bracers",belt:"belt",ring:"ring",shoulders:"shoulders",helm:"helm",amulet:"amulet",chest:"chest",gloves:"gloves",pants:"pants",boots:"boots"};
-const CLASS_ART={barbarian:{sh:1.18,wpn:"axe"},crusader:{sh:1.1,wpn:"shield"},demonhunter:{sh:0.95,wpn:"bow"},monk:{sh:1.0,wpn:"fist"},witchdoctor:{sh:1.0,wpn:"mask"},wizard:{sh:0.9,wpn:"staff"},necromancer:{sh:0.95,wpn:"scythe"}};
+const CLASS_ART={barbarian:{sh:1.2,wpn:"axe",helm:"horns"},crusader:{sh:1.12,wpn:"shield",helm:"crest"},demonhunter:{sh:0.95,wpn:"bow",helm:"hood"},monk:{sh:1.0,wpn:"fist",helm:"topknot"},witchdoctor:{sh:1.0,wpn:"mask",helm:"tribal"},wizard:{sh:0.9,wpn:"staff",helm:"wizhood"},necromancer:{sh:0.95,wpn:"scythe",helm:"necrohood"}};
+function helmShape(type,c,c2){
+  switch(type){
+    case"horns":return '<path d="M78 94 Q64 72 71 62 Q83 76 87 92 Z" fill="'+c+'"/><path d="M122 94 Q136 72 129 62 Q117 76 113 92 Z" fill="'+c+'"/><path d="M75 99 Q100 87 125 99 L125 109 Q100 100 75 109 Z" fill="'+c+'"/>';
+    case"crest":return '<path d="M93 84 Q100 42 107 84 Z" fill="'+c+'"/><path d="M75 100 Q100 90 125 100 L125 108 Q100 100 75 108 Z" fill="'+c+'"/><rect x="97.5" y="100" width="5" height="26" fill="'+c2+'" opacity=".85"/>';
+    case"hood":return '<path d="M72 112 Q75 68 100 60 Q125 68 128 112 Q128 84 100 80 Q72 84 72 112 Z" fill="'+c+'" opacity=".92"/>';
+    case"wizhood":return '<path d="M100 40 L128 116 Q100 98 72 116 Z" fill="'+c+'" opacity=".92"/><circle cx="100" cy="44" r="4" fill="'+c2+'"/>';
+    case"topknot":return '<circle cx="100" cy="70" r="6" fill="'+c+'"/><path d="M100 76 L100 84" stroke="'+c+'" stroke-width="3"/><rect x="76" y="94" width="48" height="7" rx="2" fill="'+c+'" opacity=".9"/>';
+    case"tribal":return '<path d="M84 76 l-7 -15 M100 72 l0 -17 M116 76 l7 -15" stroke="'+c2+'" stroke-width="3"/><path d="M80 90 Q100 82 120 90 Q120 120 100 130 Q80 120 80 90 Z" fill="'+c+'" opacity=".9"/><path d="M100 100 v14 M91 98 l4 3 M109 98 l-4 3" stroke="'+c2+'" stroke-width="2"/>';
+    case"necrohood":return '<path d="M72 112 Q75 66 100 58 Q125 66 128 112 Q128 82 100 78 Q72 82 72 112 Z" fill="'+c+'" opacity=".92"/><path d="M92 116 q8 6 16 0" stroke="#d9d2c0" stroke-width="2" fill="none" opacity=".7"/>';
+    default:return '';
+  }
+}
 function splitNames(n){return n.split(/ \/ | \+ /).map(s=>s.trim()).filter(Boolean)}
 function labPools(cls){
   const p={weapon:new Set(),offhand:new Set(),helm:new Set(),shoulders:new Set(),amulet:new Set(),chest:new Set(),gloves:new Set(),bracers:new Set(),belt:new Set(),pants:new Set(),boots:new Set(),ring:new Set()};
@@ -842,21 +855,27 @@ function weaponGlyph(cls,col){
   return w[CLASS_ART[cls].wpn]||w.staff;
 }
 function labPortrait(cls,gender){
-  const t=THEMES[cls]||THEMES.crusader,c=t[0],c2=t[1],tint=t[2],a=CLASS_ART[cls]||{sh:1};
-  const shW=52*a.sh, hood=gender==='female';
-  const hair=hood?'<path d="M72 96 q-8 34 2 60 M128 96 q8 34 -2 60" stroke="'+c2+'" stroke-width="7" fill="none" opacity=".75"/>':'';
+  const t=THEMES[cls]||THEMES.crusader,c=t[0],c2=t[1],tint=t[2],a=CLASS_ART[cls]||{sh:1,helm:"hood"};
+  const female=gender==='female', shW=52*a.sh*(female?0.9:1.05), headR=female?25:27;
+  const eye=cls==='necromancer'?'#d9d2c0':c2;
+  const hair=female?'<path d="M'+(100-headR+2)+' 100 q-9 34 1 58 M'+(100+headR-2)+' 100 q9 34 -1 58" stroke="'+c2+'" stroke-width="7" fill="none" opacity=".7"/>':'';
+  const beard=(!female&&cls==='barbarian')?'<path d="M86 120 Q100 140 114 120 Q112 130 100 132 Q88 130 86 120 Z" fill="'+c2+'" opacity=".55"/>':'';
   return '<svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">'
-   +'<defs><radialGradient id="mg" cx="50%" cy="38%" r="65%"><stop offset="0%" stop-color="'+tint+'"/><stop offset="100%" stop-color="#0a0806"/></radialGradient></defs>'
+   +'<defs><radialGradient id="mg" cx="50%" cy="36%" r="66%"><stop offset="0%" stop-color="'+tint+'"/><stop offset="100%" stop-color="#0a0806"/></radialGradient></defs>'
    +'<circle cx="100" cy="112" r="86" fill="url(#mg)" stroke="'+c+'" stroke-width="2" opacity=".95"/>'
-   +'<circle cx="100" cy="112" r="93" fill="none" stroke="'+c2+'" stroke-width="2" stroke-dasharray="3 10" opacity=".55"><animateTransform attributeName="transform" type="rotate" from="0 100 112" to="360 100 112" dur="44s" repeatCount="indefinite"/></circle>'
-   +'<g opacity=".5">'+weaponGlyph(cls,c2)+'</g>'
-   +'<path d="M'+(100-shW)+' 196 Q100 150 '+(100+shW)+' 196 L'+(100+shW+6)+' 214 L'+(100-shW-6)+' 214 Z" fill="#14100c" stroke="'+c+'" stroke-width="3"/>'
-   +'<rect x="92" y="128" width="16" height="22" fill="#1a1512"/>'
+   +'<circle cx="100" cy="112" r="93" fill="none" stroke="'+c2+'" stroke-width="2" stroke-dasharray="3 10" opacity=".5"><animateTransform attributeName="transform" type="rotate" from="0 100 112" to="360 100 112" dur="46s" repeatCount="indefinite"/></circle>'
+   +'<circle cx="100" cy="112" r="70" fill="none" stroke="'+c+'" stroke-width="1" stroke-dasharray="1 7" opacity=".35"><animateTransform attributeName="transform" type="rotate" from="360 100 112" to="0 100 112" dur="60s" repeatCount="indefinite"/></circle>'
+   +'<g opacity=".45">'+weaponGlyph(cls,c2)+'</g>'
+   +'<path d="M'+(100-shW)+' 198 Q100 150 '+(100+shW)+' 198 L'+(100+shW+7)+' 216 L'+(100-shW-7)+' 216 Z" fill="#14100c" stroke="'+c+'" stroke-width="3"/>'
+   +'<path d="M'+(100-shW+6)+' 196 Q100 168 '+(100+shW-6)+' 196" fill="none" stroke="'+c2+'" stroke-width="2" opacity=".5"/>'
+   +'<rect x="93" y="126" width="14" height="22" fill="#1a1512"/>'
    +hair
-   +'<circle cx="100" cy="106" r="27" fill="#1c1611" stroke="'+c+'" stroke-width="3"/>'
-   +'<path d="M74 108 Q100 66 126 108 Q126 84 100 78 Q74 84 74 108 Z" fill="'+c+'" opacity=".85"/>'
-   +'<circle cx="90" cy="108" r="3" fill="'+c2+'"/><circle cx="110" cy="108" r="3" fill="'+c2+'"/>'
-   +'<circle cx="100" cy="112" r="86" fill="none" stroke="'+c2+'" stroke-width="1" opacity=".4"><animate attributeName="opacity" values=".2;.55;.2" dur="3.5s" repeatCount="indefinite"/></circle>'
+   +'<circle cx="100" cy="106" r="'+headR+'" fill="#1c1611" stroke="'+c+'" stroke-width="3"/>'
+   +beard
+   +helmShape(a.helm,c,c2)
+   +'<circle cx="91" cy="108" r="3" fill="'+eye+'"><animate attributeName="opacity" values="1;.5;1" dur="2.8s" repeatCount="indefinite"/></circle>'
+   +'<circle cx="109" cy="108" r="3" fill="'+eye+'"><animate attributeName="opacity" values="1;.5;1" dur="2.8s" repeatCount="indefinite"/></circle>'
+   +'<circle cx="100" cy="112" r="86" fill="none" stroke="'+c2+'" stroke-width="1" opacity=".4"><animate attributeName="opacity" values=".18;.5;.18" dur="3.6s" repeatCount="indefinite"/></circle>'
    +'</svg>';
 }
 let LAB=null,_modalCb=null;

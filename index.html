@@ -231,6 +231,7 @@
       <h2>⚗ Build Analysis <span class="info" tabindex="0" data-tip="As you equip items, this compares your loadout to all Season 39 meta builds and shows the closest matches — and which items you're missing to complete the top one.">?</span></h2>
       <div id="labmatch"></div>
       <div class="labbtns" style="margin-top:12px">
+        <button class="btn" onclick="openSetAdvisor()">🛡 I have a set — what pairs?</button>
         <button class="btn" onclick="openLoadMeta()">⬇ Load a meta build</button>
         <button class="btn" onclick="clearLab()">✕ Clear</button>
         <button class="btn" onclick="copyLabCode()">🔗 Copy build code</button>
@@ -920,8 +921,11 @@ function renderMatches(P){
   if(!scores.length){host.innerHTML='<div class="tdesc">No meta-build items matched yet — you\'re freestyling! Add known legendaries to see synergies.</div>';return}
   let html=scores.map(s=>'<div class="matchrow"><b style="color:var(--gold2)">'+s.name+'</b> — '+s.have+'/'+s.total+' items ('+Math.round(s.pct*100)+'%)<div class="matchbar"><div style="width:'+Math.round(s.pct*100)+'%"></div></div></div>').join('');
   const top=scores[0];const miss=top.b.legendaries.flatMap(x=>splitNames(x[0])).concat(top.b.cube.map(x=>x[0])).concat(top.b.gems).filter(n=>!eq.includes(n));
-  if(miss.length)html+='<div class="tdesc" style="margin-top:10px"><b>To complete '+top.name+':</b> '+miss.join(', ')+'.</div>';
-  else html+='<div class="tdesc" style="margin-top:10px">🎉 You have every key item for <b>'+top.name+'</b>!</div>';
+  html+='<div class="tdesc" style="margin-top:10px"><b>Why it pairs:</b> '+top.b.how+'</div>';
+  if(miss.length){
+    html+='<div class="tdesc" style="margin-top:8px"><b>Add these to round it out:</b> '+miss.join(', ')+'.</div>';
+    html+='<div style="margin-top:8px"><button class="btn" onclick="completeBuild(\''+top.id+'\')">✨ Auto-equip the rest of '+top.name+'</button></div>';
+  } else html+='<div class="tdesc" style="margin-top:8px">🎉 You have every key item for <b>'+top.name+'</b>!</div>';
   host.innerHTML=html;
 }
 function openLoadMeta(){const c=CLASSES[LAB.cls];openModal('Load a '+c.name+' build',c.order.map(id=>({label:c.builds[id].name+(c.builds[id].free?' ★':''),sub:c.builds[id].set,value:id})),id=>applyMeta(c.builds[id]))}
@@ -933,6 +937,23 @@ function applyMeta(b){
   LAB.skills=[0,1,2,3,4,5].map(i=>b.skills[i]?{skill:b.skills[i][0],rune:b.skills[i][1]||''}:null);
   LAB.passives=[0,1,2,3].map(i=>b.passives[i]||null);
   labSave();renderLab();
+}
+function completeBuild(bId){
+  const b=CLASSES[LAB.cls].builds[bId];
+  b.legendaries.forEach(g=>{const canon=SLOTMAP[g[1]]||g[1];const names=splitNames(g[0]);
+    if(canon==='ring'){if(!LAB.gear.ring1)LAB.gear.ring1=names[0];if(!LAB.gear.ring2)LAB.gear.ring2=names[1]||names[0];}
+    else if(SLOTS.some(s=>s[0]===canon)&&!LAB.gear[canon])LAB.gear[canon]=names[0];});
+  for(let i=0;i<3;i++)if(!LAB.gems[i]&&b.gems[i])LAB.gems[i]=b.gems[i];
+  ['weapon','armor','jewelry'].forEach(s=>{if(!LAB.cube[s]){const f=b.cube.find(x=>x[1]===s);if(f)LAB.cube[s]=f[0]}});
+  for(let i=0;i<6;i++)if(!LAB.skills[i]&&b.skills[i])LAB.skills[i]={skill:b.skills[i][0],rune:b.skills[i][1]||''};
+  for(let i=0;i<4;i++)if(!LAB.passives[i]&&b.passives[i])LAB.passives[i]=b.passives[i];
+  labSave();renderLab();
+}
+function openSetAdvisor(){
+  const c=CLASSES[LAB.cls],seen={},opts=[];
+  c.order.forEach(id=>{const b=c.builds[id];if(b.set&&b.set.indexOf('Legacy')!==0&&!seen[b.set]){seen[b.set]=1;opts.push({label:b.set,sub:'→ '+b.name,value:id})}});
+  c.order.forEach(id=>{const b=c.builds[id];if(b.lod&&!seen['_lod']){seen['_lod']=1;opts.push({label:b.set,sub:'→ '+b.name,value:id})}});
+  openModal('Which set do you have? (fills in the gear that pairs with it)',opts,id=>completeBuild(id));
 }
 function clearLab(){LAB.gear={};LAB.gems=[null,null,null];LAB.cube={weapon:null,armor:null,jewelry:null};LAB.skills=[null,null,null,null,null,null];LAB.passives=[null,null,null,null];labSave();renderLab()}
 function copyLabCode(){const code=btoa(encodeURIComponent(JSON.stringify(LAB)));document.getElementById('labcode').value=code;if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(()=>{document.getElementById('labmsg').textContent='Copied!'}).catch(()=>{document.getElementById('labmsg').textContent='Select & copy the code above.'})}else{document.getElementById('labmsg').textContent='Select & copy the code above.'}}

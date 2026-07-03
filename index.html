@@ -129,6 +129,24 @@
   .matchrow{font-size:13px;padding:6px 0;border-bottom:1px dashed var(--line)}
   .matchbar{height:7px;background:#1a1009;border-radius:5px;overflow:hidden;margin-top:4px}
   .matchbar>div{height:100%;background:linear-gradient(90deg,var(--red),var(--gold));border-radius:5px}
+  /* paper-doll */
+  .paperdoll{display:grid;grid-template-columns:64px 1fr 64px;gap:10px;align-items:start;flex:1 1 320px;min-width:300px}
+  .pdcol{display:flex;flex-direction:column;gap:8px}
+  .pdfig{display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+  .pdfig svg{width:100%;max-width:200px;height:auto;filter:drop-shadow(0 6px 16px rgba(0,0,0,.5))}
+  .pdslot{width:64px;height:64px;border:1px solid var(--line);border-radius:8px;background:#120c08;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:.15s}
+  .pdslot:hover{border-color:var(--gold)}
+  .pdslot.q-orange{border-color:var(--leg)}
+  .pdslot.q-green{border-color:var(--setc)}
+  .pdslot img{width:100%;height:100%;object-fit:contain}
+  .pdslot .glyph{opacity:.35;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);text-align:center;padding:2px}
+  .pdslot .lbl{position:absolute;bottom:-1px;left:0;right:0;background:rgba(0,0,0,.55);font-size:8px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);text-align:center;pointer-events:none}
+  .pdslot .nm{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:8.5px;line-height:1.1;color:var(--leg);text-align:center;padding:3px}
+  .pdslot.q-green .nm{color:var(--setc)}
+  .pdbottom{display:flex;gap:8px;justify-content:center;margin-top:10px}
+  .opt img{width:26px;height:26px;object-fit:contain;vertical-align:middle;margin-right:8px}
+  .opt.q-orange{color:var(--leg)}.opt.q-green{color:var(--setc)}
+  @media(max-width:560px){.paperdoll{grid-template-columns:52px 1fr 52px}.pdslot{width:52px;height:52px}}
   textarea{font-family:monospace}
   footer{text-align:center;color:#5c4d3a;font-size:11px;padding:24px;letter-spacing:1px;border-top:1px solid var(--line)}
   .countdown{display:inline-block;margin-top:9px;font-size:12px;letter-spacing:1px;color:var(--gold2);background:rgba(201,162,75,.1);border:1px solid var(--line);border-radius:20px;padding:5px 14px}
@@ -222,9 +240,14 @@
 <div class="view" id="lab">
   <div style="margin-bottom:14px"><label style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold)">Class</label><div class="chiprow" id="labclassbtns" style="margin-top:6px"></div></div>
   <div class="labtop">
-    <div class="labportrait">
-      <div id="labsvg"></div>
-      <div class="labname" id="labclassname"></div>
+    <div class="labportrait" style="flex:1 1 340px">
+      <div class="paperdoll">
+        <div class="pdcol" id="pdleft"></div>
+        <div class="pdfig"><div id="labsvg"></div></div>
+        <div class="pdcol" id="pdright"></div>
+      </div>
+      <div class="pdbottom" id="pdbottom"></div>
+      <div class="labname" id="labclassname" style="margin-top:10px"></div>
       <div class="gendertoggle" id="labgender"></div>
     </div>
     <div class="labanalysis card">
@@ -241,7 +264,6 @@
     </div>
   </div>
 
-  <div class="labsec"><h3>Equipment — click a slot to equip</h3><div class="slotgrid" id="labgear"></div></div>
   <div class="labsec"><h3>Legendary Gems &amp; Kanai's Cube</h3><div class="slotgrid" id="labgemcube"></div></div>
   <div class="labsec"><h3>Active Skills</h3><div class="slotgrid" id="labskills"></div></div>
   <div class="labsec"><h3>Passives</h3><div class="slotgrid" id="labpassives"></div></div>
@@ -879,25 +901,64 @@ function labPortrait(cls,gender){
    +'<circle cx="100" cy="112" r="86" fill="none" stroke="'+c2+'" stroke-width="1" opacity=".4"><animate attributeName="opacity" values=".18;.5;.18" dur="3.6s" repeatCount="indefinite"/></circle>'
    +'</svg>';
 }
+let ITEMDB=[],ITEMBYNAME={};
+function loadItemDB(){fetch('items.json').then(r=>r.json()).then(d=>{ITEMDB=d;ITEMBYNAME={};d.forEach(it=>{ITEMBYNAME[it.n]=it});if(LAB)renderLab()}).catch(()=>{})}
+function iconFor(n){const it=ITEMBYNAME[n];return it&&it.i?('icons/'+it.i):null}
+function qualOf(n){const it=ITEMBYNAME[n];return it?it.q:null}
+function itemsForSlot(cls,slotKey){
+  const canon=poolKey(slotKey);let out=[];
+  if(ITEMDB.length)out=ITEMDB.filter(it=>it.s===canon&&(it.c==='all'||(Array.isArray(it.c)&&it.c.indexOf(cls)>=0))).map(it=>it.n);
+  const derived=labPools(cls).gear[canon]||[];derived.forEach(n=>{if(out.indexOf(n)<0)out.push(n)});
+  out.sort((a,b)=>{const qa=qualOf(a)==='green'?0:1,qb=qualOf(b)==='green'?0:1;return qa-qb||a.localeCompare(b)});
+  return out;
+}
+const PD_LEFT=['helm','shoulders','amulet','chest','gloves'],PD_RIGHT=['bracers','belt','pants','boots','ring1'],PD_BOTTOM=['weapon','offhand','ring2'];
+const SLOTLABEL={weapon:'Weapon',offhand:'Off-Hand',helm:'Helm',shoulders:'Shldr',amulet:'Amulet',chest:'Chest',gloves:'Gloves',bracers:'Bracers',belt:'Belt',pants:'Pants',boots:'Boots',ring1:'Ring',ring2:'Ring'};
+function labFigure(cls,gender){
+  const t=THEMES[cls]||THEMES.crusader,c=t[0],c2=t[1],female=gender==='female',sw=female?24:30;
+  const hair=female?'<path d="M67 34 q-7 24 0 42 M93 34 q7 24 0 42" stroke="'+c2+'" stroke-width="5" fill="none" opacity=".7"/>':'';
+  return '<svg viewBox="0 0 160 300" xmlns="http://www.w3.org/2000/svg">'
+   +'<g opacity=".5" transform="translate(20,64) scale(0.6)">'+weaponGlyph(cls,c2)+'</g>'
+   +'<path d="M72 150 L66 250 L75 268 L80 250 Z" fill="#15110c" stroke="'+c+'" stroke-width="2"/><path d="M88 150 L94 250 L85 268 L80 250 Z" fill="#15110c" stroke="'+c+'" stroke-width="2"/>'
+   +'<path d="M60 262 L79 262 L81 279 L58 279 Z" fill="#1c1611" stroke="'+c+'" stroke-width="2"/><path d="M100 262 L81 262 L79 279 L102 279 Z" fill="#1c1611" stroke="'+c+'" stroke-width="2"/>'
+   +'<path d="M'+(80-sw)+' 64 L'+(80-sw-8)+' 140 L'+(80-sw+2)+' 150 L'+(80-sw+12)+' 80 Z" fill="#17120d" stroke="'+c+'" stroke-width="2"/><path d="M'+(80+sw)+' 64 L'+(80+sw+8)+' 140 L'+(80+sw-2)+' 150 L'+(80+sw-12)+' 80 Z" fill="#17120d" stroke="'+c+'" stroke-width="2"/>'
+   +'<path d="M'+(80-sw+6)+' 66 L'+(80+sw-6)+' 66 L'+(80+sw-14)+' 152 L'+(80-sw+14)+' 152 Z" fill="#14100c" stroke="'+c+'" stroke-width="2.5"/><path d="M80 70 L80 148" stroke="'+c2+'" stroke-width="1.5" opacity=".4"/>'
+   +'<ellipse cx="'+(80-sw+2)+'" cy="68" rx="13" ry="10" fill="'+c+'"/><ellipse cx="'+(80+sw-2)+'" cy="68" rx="13" ry="10" fill="'+c+'"/>'
+   +'<rect x="'+(80-sw+12)+'" y="146" width="'+((sw-12)*2)+'" height="9" fill="'+c+'" opacity=".85"/>'
+   +'<rect x="74" y="46" width="12" height="12" fill="#1a1512"/>'+hair
+   +'<circle cx="80" cy="36" r="14" fill="#1c1611" stroke="'+c+'" stroke-width="2.5"/>'
+   +'<path d="M66 38 Q80 16 94 38 Q94 27 80 24 Q66 27 66 38 Z" fill="'+c+'" opacity=".9"/>'
+   +'<circle cx="75" cy="38" r="2" fill="'+c2+'"/><circle cx="85" cy="38" r="2" fill="'+c2+'"/>'
+   +'</svg>';
+}
+function pdSlotEl(key){
+  const it=LAB.gear[key],q=it?qualOf(it):null,ic=it?iconFor(it):null;
+  const el=document.createElement('div');el.className='pdslot'+(q?' q-'+q:'');el.title=(SLOTLABEL[key]||key)+(it?': '+it:' (empty)');
+  el.innerHTML=(it?(ic?'<img src="'+ic+'" alt="">':'<div class="nm">'+it+'</div>'):'<div class="glyph">'+(SLOTLABEL[key]||key)+'</div>')+'<div class="lbl">'+(SLOTLABEL[key]||key)+'</div>';
+  el.onclick=()=>pickGear(key,SLOTLABEL[key]||key);return el;
+}
+function renderPaperdoll(){
+  document.getElementById('labsvg').innerHTML=labFigure(LAB.cls,LAB.gender);
+  const L=document.getElementById('pdleft'),R=document.getElementById('pdright'),B=document.getElementById('pdbottom');
+  L.innerHTML='';R.innerHTML='';B.innerHTML='';
+  PD_LEFT.forEach(k=>L.appendChild(pdSlotEl(k)));PD_RIGHT.forEach(k=>R.appendChild(pdSlotEl(k)));PD_BOTTOM.forEach(k=>B.appendChild(pdSlotEl(k)));
+}
 let LAB=null,_modalCb=null;
 function labLoad(){try{return JSON.parse(localStorage.getItem('d3master_lab'))}catch(e){return null}}
 function labSave(){localStorage.setItem('d3master_lab',JSON.stringify(LAB))}
 function labDefault(){return {cls:'barbarian',gender:'male',gear:{},gems:[null,null,null],cube:{weapon:null,armor:null,jewelry:null},skills:[null,null,null,null,null,null],passives:[null,null,null,null]}}
 function poolKey(slot){return slot==='ring1'||slot==='ring2'?'ring':slot}
 function equippedNames(){const g=Object.values(LAB.gear).filter(Boolean);return g.concat(LAB.gems.filter(Boolean)).concat(Object.values(LAB.cube).filter(Boolean))}
-function openModal(title,opts,cb){_modalCb=cb;document.getElementById('modaltitle').textContent=title;document.getElementById('modalsearch').value='';const host=document.getElementById('modalopts');host.innerHTML='';opts.forEach(o=>{const b=document.createElement('button');b.className='opt';b.innerHTML=o.label+(o.sub?' <small>'+o.sub+'</small>':'');b.onclick=()=>{closeModal();cb(o.value)};host.appendChild(b)});document.getElementById('labmodal').classList.add('open');setTimeout(()=>document.getElementById('modalsearch').focus(),30)}
+function openModal(title,opts,cb){_modalCb=cb;document.getElementById('modaltitle').textContent=title;document.getElementById('modalsearch').value='';const host=document.getElementById('modalopts');host.innerHTML='';opts.forEach(o=>{const b=document.createElement('button');b.className='opt'+(o.q?' q-'+o.q:'');b.innerHTML=(o.icon?'<img src="'+o.icon+'" alt="">':'')+o.label+(o.sub?' <small>'+o.sub+'</small>':'');b.onclick=()=>{closeModal();cb(o.value)};host.appendChild(b)});document.getElementById('labmodal').classList.add('open');setTimeout(()=>document.getElementById('modalsearch').focus(),30)}
 function closeModal(){document.getElementById('labmodal').classList.remove('open')}
 function filterOpts(){const q=document.getElementById('modalsearch').value.toLowerCase();[...document.getElementById('modalopts').children].forEach(b=>b.style.display=b.textContent.toLowerCase().includes(q)?'':'none')}
 function renderLab(){
   const P=labPools(LAB.cls);
-  document.getElementById('labsvg').innerHTML=labPortrait(LAB.cls,LAB.gender);
+  renderPaperdoll();
   document.getElementById('labclassname').textContent=CLASSES[LAB.cls].name+' · '+(LAB.gender==='female'?'Female':'Male');
   // class chips
   const cb=document.getElementById('labclassbtns');cb.innerHTML='';ORDER.forEach(id=>{const b=document.createElement('button');b.className='chip'+(id===LAB.cls?' active':'');b.textContent=CLASSES[id].name;b.onclick=()=>{LAB.cls=id;LAB.gear={};LAB.gems=[null,null,null];LAB.cube={weapon:null,armor:null,jewelry:null};LAB.skills=[null,null,null,null,null,null];LAB.passives=[null,null,null,null];labSave();renderLab()};cb.appendChild(b)});
   const gb=document.getElementById('labgender');gb.innerHTML='';[['male','Male'],['female','Female']].forEach(g=>{const b=document.createElement('button');b.className='chip'+(g[0]===LAB.gender?' active':'');b.textContent=g[1];b.onclick=()=>{LAB.gender=g[0];labSave();renderLab()};gb.appendChild(b)});
-  // gear
-  const gear=document.getElementById('labgear');gear.innerHTML='';
-  SLOTS.forEach(([key,label])=>{const it=LAB.gear[key];const el=document.createElement('div');el.className='slot2';el.innerHTML='<div class="sl">'+label+'</div><div class="it'+(it?'':' empty')+'">'+(it||'— empty —')+'</div>';el.onclick=()=>pickGear(key,label,P);gear.appendChild(el)});
   // gems + cube
   const gc=document.getElementById('labgemcube');gc.innerHTML='';
   [0,1,2].forEach(i=>{const it=LAB.gems[i];const el=document.createElement('div');el.className='slot2';el.innerHTML='<div class="sl">Legendary Gem '+(i+1)+'</div><div class="it gemc'+(it?'':' empty')+'">'+(it||'— empty —')+'</div>';el.onclick=()=>openModal('Legendary Gem',clearFirst(P.gems),v=>{LAB.gems[i]=v;labSave();renderLab()});gc.appendChild(el)});
@@ -911,7 +972,7 @@ function renderLab(){
   renderMatches(P);
 }
 function clearFirst(arr){return [{label:'— clear —',value:null}].concat(arr.map(n=>({label:n,value:n})))}
-function pickGear(slot,label,P){const arr=P.gear[poolKey(slot)]||[];const opts=clearFirst(arr);openModal(label,opts,v=>{LAB.gear[slot]=v||undefined;labSave();renderLab()})}
+function pickGear(slot,label){const arr=itemsForSlot(LAB.cls,slot);const opts=[{label:'— clear —',value:null}].concat(arr.map(n=>({label:n,value:n,icon:iconFor(n),q:qualOf(n)})));openModal(label+' — '+arr.length+' options',opts,v=>{LAB.gear[slot]=v||undefined;labSave();renderLab()})}
 function pickSkill(i,P){const names=Object.keys(P.skills).sort();openModal('Skill',[{label:'— clear —',value:null}].concat(names.map(n=>({label:n,value:n}))),skill=>{if(!skill){LAB.skills[i]=null;labSave();renderLab();return}const runes=[...P.skills[skill]].sort();if(!runes.length){LAB.skills[i]={skill,rune:''};labSave();renderLab();return}openModal(skill+' — rune',[{label:'(no rune)',value:''}].concat(runes.map(r=>({label:r,value:r}))),rune=>{LAB.skills[i]={skill,rune};labSave();renderLab()})})}
 function renderMatches(P){
   const eq=equippedNames();const host=document.getElementById('labmatch');
@@ -980,7 +1041,7 @@ function ding(){if(!SFX)return;try{_ac=_ac||new (window.AudioContext||window.web
 (function countdown(){const end=new Date(2026,8,27,17,0,0),now=new Date();const days=Math.max(0,Math.ceil((end-now)/86400000));document.getElementById('countdown').innerHTML=days>0?`Season 39 · <b>~${days} days</b> left (est.)`:'Season 39 has ended';})();
 
 /* ---- tools init ---- */
-renderCDRSources();renderCDRPresets();updateAugClass();calcShards();calcCDR();calcAug();renderGap();updateSfxBtn();initLab();
+renderCDRSources();renderCDRPresets();updateAugClass();calcShards();calcCDR();calcAug();renderGap();updateSfxBtn();initLab();loadItemDB();
 try{const gs=JSON.parse(localStorage.getItem('d3master_gapstats'))||{};if(gs.cdr!=null)document.getElementById('gapcdr').value=gs.cdr;if(gs.main!=null)document.getElementById('gapmain').value=gs.main;}catch(e){}
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}</script>

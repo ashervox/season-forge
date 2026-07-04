@@ -1216,6 +1216,10 @@ function syncAncientFlag(it){
   if(typeof it.tier==='string')return /ancient|primal/i.test(it.tier);
   return null; // unknown — flagged in UI rather than guessed
 }
+function syncNotFoundMsg(status,fallback){
+  if(status===404)return '⚠ Not found for any region. If your BattleTag is confirmed correct, this is often because Blizzard\'s D3 API doesn\'t recognize Xbox Game Pass / Microsoft-linked Battle.net accounts — a limitation on their side, not this site. Please use manual entry below instead.';
+  return '⚠ '+(fallback||'Could not fetch that profile.');
+}
 async function syncFetchCareer(){
   const tag=document.getElementById('syncTag').value.trim(),region=document.getElementById('syncRegion').value;
   const msg=document.getElementById('syncMsg');
@@ -1224,7 +1228,7 @@ async function syncFetchCareer(){
   try{
     const r=await fetch(SYNC_WORKER_URL+'?battletag='+encodeURIComponent(tag)+'&region='+region);
     const data=await r.json();
-    if(!r.ok){msg.textContent='⚠ '+(data.error||'Could not fetch that profile.');return}
+    if(!r.ok){msg.textContent=syncNotFoundMsg(r.status,data.error);return}
     const heroes=data.heroes||[];
     if(!heroes.length){msg.textContent='No heroes found on that profile.';return}
     msg.textContent=heroes.length+' hero(es) found — pick one to sync:';
@@ -1241,7 +1245,7 @@ async function syncSelectHero(tag,region,heroId,cls){
   try{
     const r=await fetch(SYNC_WORKER_URL+'?battletag='+encodeURIComponent(tag)+'&region='+region+'&hero='+heroId);
     const hero=await r.json();
-    if(!r.ok){msg.textContent='⚠ '+(hero.error||'Could not load that hero.');return}
+    if(!r.ok){msg.textContent=syncNotFoundMsg(r.status,hero.error);return}
     if(CLASSES[cls]){
       const opts=[...document.getElementById('azBuild').options];
       const match=opts.find(o=>o.value.indexOf(cls+'/')===0);

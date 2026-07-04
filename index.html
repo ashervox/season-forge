@@ -214,6 +214,8 @@
   <div class="tab" data-view="lab" data-desc="Try any gear/skill combo on a full-body character and see what it matches."><span class="tabicon">🧪</span>Build Lab</div>
   <div class="tab" data-view="journey" data-desc="Track your Season Journey chapters and Conquests, checkbox by checkbox."><span class="tabicon">🗺️</span>Season Journey</div>
   <div class="tab" data-view="tools" data-desc="Calculators, glossary, and the Season 39 gimmicks (Cube slot 4, Shadow Clones)."><span class="tabicon">🧰</span>Tools & Reference</div>
+  <div class="tab" data-view="analyzer" data-desc="Enter your actual gear and compare it against your chosen build's ideal setup, slot by slot."><span class="tabicon">🔍</span>Gear Check</div>
+  <div class="tab" data-view="launch" data-desc="Season 39 launch news feed: patch notes, hotfixes, and an early build tier list."><span class="tabicon">📰</span>Season Launch</div>
 </div>
 <div class="tabdesc" id="tabdesc"></div>
 
@@ -247,6 +249,7 @@
   <div class="pickers">
     <div style="flex:1 1 260px"><label><span style="color:var(--gold2)">① </span>Class</label><div class="chiprow" id="classbtns"></div></div>
     <div style="flex:1 1 260px"><label><span style="color:var(--gold2)">② </span>Goal Build <span class="slot">(★ = free set)</span></label><div class="chiprow" id="buildbtns"></div></div>
+    <div style="flex:1 1 260px"><label><span style="color:var(--gold2)">③ </span>Tier <span class="info" tabindex="0" data-tip="Same build, different stage of gearing. Toggle to see what changes about gear priority and paragon focus at each stage. Skills/legendaries listed below stay the endgame target throughout — these are generic staging principles, not per-tier item swaps.">?</span></label><div class="chiprow" id="tierbtns"></div></div>
   </div>
   <div class="progwrap">
     <div class="progbar"><div class="progfill" id="gprog"></div></div>
@@ -263,13 +266,23 @@
       <div class="stat-row"><span>Main Stat</span><span id="pMain"></span></div>
     </div>
     <div class="card">
-      <h2>Leveling Plan (1 → 70)</h2>
+      <h2><span id="pLevelTitle">Leveling Plan (1 → 70)</span></h2>
       <ul class="gear" id="pLevel"></ul>
     </div>
     <div class="card full">
       <h2>Paragon Priority <span class="slot" id="pgnTip"></span></h2>
       <div class="grid" style="gap:14px" id="pgnGrid"></div>
       <div class="tdesc" style="font-size:12px;margin-top:10px;color:var(--muted)">Caps: Movement Speed 25% total (gear + paragon) · Paragon Cooldown Reduction 10% · Attack Speed / Crit Chance / Crit Damage / Resource Cost Reduction each cap at 50 points.</div>
+    </div>
+    <div class="card full">
+      <h2>📈 GR Pushing Reference <span class="info" tabindex="0" data-tip="General toughness/DPS breakpoint principles and Rift Guardian enrage guidance. These are generic rules of thumb, not per-build verified numbers — treat as a starting framework, not exact targets.">?</span></h2>
+      <div class="howbox">⚠ Generic guidance, not per-build verified breakpoints (that data isn't available in this dataset). Use as a framework, confirm against your own clears.</div>
+      <div class="grid" style="gap:14px">
+        <div class="pgncat"><b>Toughness check</b><span>You should be able to face-tank 2-3 hits from same-tier trash without dying. If one white-mob hit kills you, you're pushing too high on toughness relative to your DPS — gear more Life%/Armor/Resist before adding more offense.</span></div>
+        <div class="pgncat"><b>DPS check</b><span>Trash packs should die in 1-3 hits of your main skill at your current pushing tier. If packs take 5+ hits and you're not dying, you have toughness to spare — trade some defense for offense.</span></div>
+        <div class="pgncat"><b>Rift Guardian enrage</b><span>Most Guardians enrage (heavy damage/speed boost) around the 5-minute mark if not defeated. RGK (Rift-Guardian-Killer) builds exist specifically to burst the boss before enrage; if your build is a "trash clear" style, expect to time-out on Guardians well before you time-out on trash density.</span></div>
+        <div class="pgncat"><b>When to stop pushing higher</b><span>If your clear time is creeping past ~10-12 minutes or you're dying repeatedly to one-shots, that's your practical solo ceiling for this gear level — focus on upgrading items/gems/paragon rather than forcing a higher key.</span></div>
+      </div>
     </div>
     <div class="card full">
       <h2>🎯 Endgame Target — <span id="pBuildName" style="text-transform:none;letter-spacing:0;color:var(--gold2)"></span></h2>
@@ -371,6 +384,11 @@
     <div id="cqrecommend"></div>
     <div id="jnyconquests"></div>
   </div>
+  <div class="card full" style="margin-top:18px">
+    <h2>Set Dungeon Tracker <span id="sdcount" style="margin-left:auto;font-size:12px;letter-spacing:1px"></span></h2>
+    <div class="howbox">⚠ Built from the set names already in this site's build data (verified), but the exact dungeon location/objectives per set are NOT independently confirmed here — double check in-game. <b>Masters of the Universe</b> needs <b>8 total Set Dungeon Masteries</b> — these can come from any class you have, not just one, so the list below spans all 7 classes.</div>
+    <div id="setdungeons"></div>
+  </div>
 </div>
 
 <!-- ===== TOOLS ===== -->
@@ -414,6 +432,7 @@
         <div><label>Your gem's current rank</label><input type="number" id="gemrank" value="50" min="0" oninput="calcGemOdds()"></div>
         <div><label>Greater Rift level cleared</label><input type="number" id="gemgr" value="55" min="1" oninput="calcGemOdds()"></div>
       </div>
+      <div style="margin-top:8px"><label class="cdropt"><input type="checkbox" id="gemnodeath" onchange="calcGemOdds()"> No deaths this Rift (+1 attempt)</label><label class="cdropt"><input type="checkbox" id="gemempowered" onchange="calcGemOdds()"> Empowered Rift (gold-paid, +1 attempt)</label></div>
       <div class="calcout" id="gemodds"></div>
       <div class="tdesc" style="font-size:11.5px;margin-top:8px">Community-documented odds table, not official Blizzard numbers. Each upgrade attempt (up to 5 per Rift w/ no-death + gold-empowered bonuses) recalculates — a gem can go 100%→60%→30% across attempts as its rank climbs mid-run.</div>
     </div>
@@ -451,6 +470,52 @@
   </div>
 </div>
 
+<!-- ===== GEAR ANALYZER ===== -->
+<div class="view" id="analyzer">
+  <div class="card full" style="margin-bottom:14px">
+    <h2>🔍 Gear Check — Compare Your Real Gear to a Build</h2>
+    <div class="tdesc" style="margin-bottom:10px">Enter what you actually have equipped, slot by slot, and see exactly what's Good, needs improvement, or is the wrong item for your chosen build. Nothing here is uploaded — it's saved only in this browser.</div>
+    <div class="pickers" style="margin-bottom:6px">
+      <div style="flex:1 1 260px"><label>Compare against build</label><select class="bigsel" id="azBuild" style="width:100%" onchange="onAzBuildChange()"></select></div>
+    </div>
+    <button class="btn" onclick="clearAnalyzer()">✕ Clear my entries</button>
+  </div>
+  <div class="card full" style="margin-bottom:14px">
+    <h2>🎯 Fix This First <span class="info" tabindex="0" data-tip="Ranked by impact: a missing build-defining item outweighs a missing Ancient rarity flag, which outweighs a minor stat gap.">?</span></h2>
+    <div id="azFixFirst"></div>
+  </div>
+  <div class="card full">
+    <h2>Your Gear <span class="slot">(leave slots blank if unsure — partial input still gives useful results)</span></h2>
+    <div id="azRows"></div>
+    <div class="grid" style="gap:14px;margin-top:14px">
+      <div><label style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)">Main stat (total)</label><input type="number" id="azMain" oninput="renderAnalyzer()" style="width:100%;background:#120c08;border:1px solid var(--line);color:var(--gold2);padding:8px;border-radius:6px"></div>
+      <div><label style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)">CDR %</label><input type="number" id="azCdr" oninput="renderAnalyzer()" style="width:100%;background:#120c08;border:1px solid var(--line);color:var(--gold2);padding:8px;border-radius:6px"></div>
+      <div><label style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)">Crit Hit Chance %</label><input type="number" id="azChc" oninput="renderAnalyzer()" style="width:100%;background:#120c08;border:1px solid var(--line);color:var(--gold2);padding:8px;border-radius:6px"></div>
+      <div><label style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)">Crit Hit Damage %</label><input type="number" id="azChd" oninput="renderAnalyzer()" style="width:100%;background:#120c08;border:1px solid var(--line);color:var(--gold2);padding:8px;border-radius:6px"></div>
+    </div>
+    <div class="howbox" style="margin-top:14px">⚠ Stat-target comparison is approximate: this dataset doesn't include verified per-build breakpoint numbers (e.g. exact CDR% needed for a specific skill), so the stat check below uses general rules of thumb, not build-specific numeric targets. Item-slot comparison (Good/Wrong Item/Missing) is based on this site's actual build data and is reliable.</div>
+    <div id="azStatCheck"></div>
+  </div>
+</div>
+
+<!-- ===== SEASON LAUNCH ===== -->
+<div class="view" id="launch">
+  <div class="card full" style="margin-bottom:14px">
+    <h2 id="launchH1">📰 Season 39: Shades of the Nephalem — Live</h2>
+    <div class="tdesc" id="launchUpdated" style="margin-bottom:10px"></div>
+    <div class="grid" style="gap:10px" id="launchGlance"></div>
+  </div>
+  <div class="card full" style="margin-bottom:14px">
+    <h2>🏆 Build Tier List <span class="info" tabindex="0" data-tip="Editable as the meta settles — use the ▲▼ arrows to reorder within a class. This is a starting seed, not a final verdict; treat it as a living document.">?</span></h2>
+    <div class="tdesc" style="margin-bottom:10px">⚠ Seeded automatically (free-set builds ranked A, others B) — reorder/re-tier as real meta data comes in during the first week.</div>
+    <div id="launchTierList"></div>
+  </div>
+  <div class="card full">
+    <h2>🔴 Live Updates</h2>
+    <div id="launchFeed"></div>
+  </div>
+</div>
+
 </div>
 <footer>Diablo 3 Season 39 · all data from current Maxroll / Icy Veins guides · offline · progress saved per device</footer>
 
@@ -459,6 +524,8 @@
   <button class="bnitem" data-view="lab"><span class="tabicon">🧪</span>Lab</button>
   <button class="bnitem" data-view="journey"><span class="tabicon">🗺️</span>Journey</button>
   <button class="bnitem" data-view="tools"><span class="tabicon">🧰</span>Tools</button>
+  <button class="bnitem" data-view="analyzer"><span class="tabicon">🔍</span>Gear</button>
+  <button class="bnitem" data-view="launch"><span class="tabicon">📰</span>Launch</button>
 </div>
 
 <script>
@@ -485,6 +552,15 @@ const CUBE4={
  "necromancer/masq":["Obsidian Ring of the Zodiac","more CDR for Simulacrum/Bone Armor uptime"],
  "necromancer/rat":["Focus & Restraint","free damage/toughness pairing alongside your LoD ancients"],
 };
+/* Fallback for the ~51 builds without a hand-tuned pick above — a safe generic recommendation per class. Flagged: not build-specific, verify before treating as BiS. */
+const CUBE4_DEFAULT={barbarian:["Nemesis Bracers","free extra elite pack = more Fury/proc uptime — solid on almost any Barb build"],
+ crusader:["Obsidian Ring of the Zodiac","extra CDR helps nearly every Crusader cooldown rotation"],
+ demonhunter:["Focus & Restraint","free damage/toughness pair without costing a ring slot"],
+ monk:["Obsidian Ring of the Zodiac","extra CDR helps Mantra/Epiphany-style rotations on most Monk builds"],
+ witchdoctor:["Nemesis Bracers","free extra elite pack feeds pet/DoT builds well"],
+ wizard:["Obsidian Ring of the Zodiac","extra CDR helps most Wizard cooldown-reliant rotations"],
+ necromancer:["Focus & Restraint","free damage/toughness pair — safe default across Necro builds"]};
+function cube4For(cId,bId){return CUBE4[cId+'/'+bId]||CUBE4_DEFAULT[cId]}
 
 /* Season 39 theme: Shrine/Pylon spawns a shadow clone of your class (60s, scaled to you) using 1 of 3 fixed skill-only loadouts (no passives/gear). Data = Season 22 rerun (identical mechanic). */
 const SHADOW_CLONES={
@@ -760,7 +836,42 @@ function renderParagon(cId,c,bId){
     ["Utility","Area Damage → Resource Cost Reduction → Life on Hit → Gold/Globe radius."]
   ];
   document.getElementById('pgnGrid').innerHTML=cats.map(x=>`<div class="pgncat"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("");
-  document.getElementById('pgnTip').textContent=PGN_TIP[bId]?('· Tip: '+PGN_TIP[bId]):'';
+  const tier=curTier(),tg=TIER_GUIDANCE[tier];
+  document.getElementById('pgnTip').textContent=(PGN_TIP[bId]?('· Tip: '+PGN_TIP[bId]+' '):'')+'· '+tg.paragon;
+}
+/* ============ Difficulty Slider (Leveling / Fresh 70 / T16 Farm / GR Pushing) ============
+   Generic, principled staging guidance — NOT per-build verified item/skill swaps (that data
+   isn't available). The skills/gear lists always show the endgame (GR Pushing) target. */
+const TIERS=[["leveling","Leveling"],["fresh70","Fresh 70"],["t16","T16 Farm"],["grpush","GR Pushing"]];
+const TIER_GUIDANCE={
+ leveling:{gear:"Don't worry about gear yet — a Gem of Ease in your weapon and whatever drops is fine. Priority is XP gain and reaching 70 fast.",paragon:"Leveling: dump points into Vitality/main stat, ignore breakpoints entirely."},
+ fresh70:{gear:"Survivability first: All Resistance, Life%, Armor. Grab Ring of Royal Grandeur ASAP (Act I caches) and claim your Haedrig's Gift set — that alone is a huge power spike. Don't chase Ancient rarity yet, just get 6-piece bonuses online.",paragon:"Fresh 70: weight Defense tree heavily (survive first), light Offense, minimal Utility."},
+ t16:{gear:"Speed over max damage: Attack Speed, Movement Speed, Cooldown Reduction for farming rotations, and pickup radius/Boon of the Hoarder style utility if you have Cube room. Ancient items help but aren't required to clear T16 comfortably.",paragon:"T16 Farm: push Movement Speed to the 25% cap first, then CDR/Attack Speed — comfort and speed matter more than raw damage here."},
+ grpush:{gear:"Full min-max: Ancient/Primal in every slot, exact breakpoints (CDR, Attack Speed, Crit), Area Damage, and the specific legendaries/cube powers listed below. This is the endgame target shown throughout this page.",paragon:"GR Pushing: follow the Core/Offense/Defense/Utility priority order below exactly — every point matters at this stage."},
+};
+function curTier(){return localStorage.getItem('d3master_tier')||'grpush'}
+function renderTierChips(){
+  const cur=curTier(),host=document.getElementById('tierbtns');host.innerHTML='';
+  TIERS.forEach(([id,label])=>{const b=document.createElement('button');b.className='chip'+(id===cur?' active':'');b.textContent=label;b.onclick=()=>{localStorage.setItem('d3master_tier',id);renderGuide()};host.appendChild(b)});
+}
+function renderTierContent(cId,c,bId,b){
+  const tier=curTier();
+  if(tier==='leveling'){
+    document.getElementById('pLevelTitle').textContent='Leveling Plan (1 → 70)';
+    document.getElementById('pLevel').innerHTML=c.leveling.map(x=>li(x)).join('');
+  }else{
+    const label=TIERS.find(t=>t[0]===tier)[1];
+    document.getElementById('pLevelTitle').textContent='Gear Priority — '+label;
+    document.getElementById('pLevel').innerHTML='<li style="list-style:none;padding:6px 0"><span class="tdesc">'+TIER_GUIDANCE[tier].gear+'</span></li>';
+  }
+}
+/* Simple keyword heuristic for "why this skill" role tags — not hand-authored per build. */
+function skillRole(text){
+  const t=text.toLowerCase();
+  if(/charge|sprint|dash|vault|teleport|rush|leap|jaunt|steed|strike\b.*dash/.test(t))return 'Mobility';
+  if(/iron skin|armor|shield|sanctuary|reflect|ignore pain|invulnerab|barrier|epiphany|inner sanct/.test(t))return 'Survivability';
+  if(/champion|mantra|law|cry|totem|buff|companion|prophet|conviction|banner|inspir/.test(t))return 'Utility';
+  return 'Damage';
 }
 const SHADOW_WORTH={barbarian:"Decent burst filler — none outclass your main rotation, but free damage during the 60s window is still free damage.",crusader:"The Condemn variation hits hardest; all three are safe to just let ride while you keep playing your own build.",demonhunter:"All three lean AoE/burst — worth actively grabbing Shrines/Pylons on packs since DH clones hit well above their own gear.",monk:"Wave of Light variation has the biggest single hits; still a bonus, not a build to build around.",witchdoctor:"Zombie Bears variation is the standout — strong enough that some players path toward Pylons/Shrines just to proc it.",wizard:"Blizzard/Twister variation covers the most ground; all 3 are safe passive value adds.",necromancer:"Bone Spear variation is the cleanest single-target; Corpse Lance covers more area — either is a solid bonus."};
 function renderShadowClones(cId){
@@ -823,16 +934,16 @@ function renderGuide(){
   document.getElementById('pGoal').textContent=b.name;
   document.getElementById('pSet').innerHTML=setSpan+((b.free||b.lod)?"":' <span class="slot">(farm it)</span>');
   document.getElementById('pMain').textContent=c.mainStat+" → "+c.gemType+" augments";
-  document.getElementById('pLevel').innerHTML=c.leveling.map(x=>li(x)).join("");
+  renderTierChips();renderTierContent(cId,c,bId,b);
   document.getElementById('pBuildName').textContent=b.name;
   document.getElementById('gsetline').innerHTML=setSpan+(b.free?" — the free Haedrig's set":(b.lod?" — no class set":" — not the free set"));
   document.getElementById('gtagline').textContent=b.tag;
   document.getElementById('ghow').innerHTML=b.how||"";
-  document.getElementById('gskills').innerHTML=b.skills.map(s=>li(`${s[0]}${s[1]?" — <b>"+s[1]+"</b>":""}${slotTxt(s[2])}`)).join("");
-  document.getElementById('gpassives').innerHTML=b.passives.map(p=>li(p)).join("");
+  document.getElementById('gskills').innerHTML=b.skills.map(s=>li(`${s[0]}${s[1]?" — <b>"+s[1]+"</b>":""}${slotTxt(s[2])} <span class="pill med" style="margin-left:6px" title="Heuristic role tag — auto-generated from the skill/rune name, not hand-authored per build.">${skillRole(s[0]+' '+(s[1]||''))}</span>`)).join("");
+  document.getElementById('gpassives').innerHTML=b.passives.map(p=>li(p+` <span class="pill med" style="margin-left:6px" title="Heuristic role tag — auto-generated, not hand-authored per build.">${skillRole(p)}</span>`)).join("");
   document.getElementById('glegendaries').innerHTML=b.legendaries.map(g=>li('<span class="leg">'+g[0]+'</span>'+slotTxt(g[1]))).join("");
   document.getElementById('gcube').innerHTML=b.cube.map(g=>li('<span class="leg">'+g[0]+'</span>'+slotTxt(g[1]))).join("");
-  const c4=CUBE4[cId+'/'+bId];
+  const c4=cube4For(cId,bId);
   document.getElementById('gcube4').innerHTML=c4?('<b style="color:var(--gold2)">Slot 4 (any):</b> <span class="leg">'+c4[0]+'</span> — '+c4[1]+'.'):'';
   document.getElementById('ggems').innerHTML=b.gems.map(g=>li('<span class="setc">'+g+'</span>')).join("");
   renderParagon(cId,c,bId);
@@ -908,6 +1019,26 @@ function renderConquests(){
 }
 renderJourney();renderConquests();
 
+function collectAllSets(){
+  const list=[];
+  ORDER.forEach(cId=>{const seen={};CLASSES[cId].order.forEach(bId=>{const b=CLASSES[cId].builds[bId];
+    if(b.lod||!b.set||b.set.indexOf('Legacy')===0||seen[b.set])return;seen[b.set]=1;list.push({cls:cId,set:b.set});});});
+  return list;
+}
+function renderSetDungeons(){
+  const sets=collectAllSets(),st=jnyLoad('setdungeons'),host=document.getElementById('setdungeons');host.innerHTML='';let done=0;
+  sets.forEach((s,i)=>{
+    const d=!!st[i];if(d)done++;
+    const el=document.createElement('div');el.className='task'+(d?' done':'');
+    el.innerHTML=`<div class="chk"></div><div><div class="ttitle">${s.set} <span class="slot">· ${CLASSES[s.cls].name}</span></div></div>`;
+    el.onclick=()=>{const ss=jnyLoad('setdungeons');ss[i]=!ss[i];jnySave('setdungeons',ss);renderSetDungeons()};
+    host.appendChild(el);
+  });
+  const cc=document.getElementById('sdcount');cc.textContent=`${done} / 8 needed (${sets.length} total set dungeons tracked)`;
+  cc.style.color=done>=8?'var(--setc)':'var(--muted)';
+}
+renderSetDungeons();
+
 function recommendConquests(){
   const cId=curClassId(),c=CLASSES[cId],bId=curBuildId(cId),b=c.builds[bId];
   const scored=CONQUESTS.map((cq,i)=>{
@@ -955,15 +1086,22 @@ function calcAug(){
   document.getElementById('augout').innerHTML=`Rank ${r} augment = <b>+${stat}</b> ${c.mainStat} on one slot.<br>Recipe: 3 Flawless Royal ${c.gemType} + a rank-${r} Legendary Gem (consumed) on an Ancient/Primal item.<br>All 13 slots at rank ${r} = <b>+${stat*13}</b> ${c.mainStat}.`;
 }
 function gemOddsPct(diff){
-  if(diff>=2)return 100; if(diff===1)return 60; if(diff===0)return 30; if(diff===-1)return 15;
-  if(diff===-2)return 8; if(diff===-3)return 4; if(diff===-4)return 2; if(diff===-5)return 1; return 0;
+  if(diff>=10)return 100; if(diff===9)return 90; if(diff===8)return 80; if(diff===7)return 70;
+  if(diff>=0)return 60; if(diff===-1)return 30; if(diff===-2)return 15; if(diff===-3)return 8;
+  if(diff===-4)return 4; if(diff===-5)return 2; if(diff===-6)return 1; return 0;
 }
 function calcGemOdds(){
   const rank=Math.max(0,+document.getElementById('gemrank').value||0),gr=Math.max(1,+document.getElementById('gemgr').value||1);
-  const diff=gr-rank,pct=gemOddsPct(diff);
+  const noDeath=document.getElementById('gemnodeath').checked,empowered=document.getElementById('gemempowered').checked;
+  const diff=gr-rank,pct=gemOddsPct(diff),p=pct/100;
+  const attempts=Math.min(5,3+(noDeath?1:0)+(empowered?1:0));
+  const cumulative=Math.round((1-Math.pow(1-p,attempts))*10000)/100;
   let color=pct>=60?'var(--setc)':(pct>=15?'var(--gold2)':'var(--red2)');
-  document.getElementById('gemodds').innerHTML=`Rift ${gr} vs rank ${rank} gem (diff ${diff>=0?'+':''}${diff}) → <b style="color:${color}">${pct}%</b> chance per upgrade attempt.<br>`+
-   `Rule of thumb: push Rifts <b>2+ levels above</b> your gem's rank for guaranteed (100%) upgrades; right at your rank = 30%.`;
+  document.getElementById('gemodds').innerHTML=`Rift ${gr} vs rank ${rank} gem (diff ${diff>=0?'+':''}${diff}) → <b style="color:${color}">${pct}%</b> chance per single upgrade attempt.<br>`+
+   `<b style="color:var(--gold2)">${attempts} attempts</b> this Rift (3 base${noDeath?' +1 no-death':''}${empowered?' +1 empowered':''}, capped at 5) → `+
+   `<b style="color:var(--setc)">~${cumulative}%</b> chance of at least one success across all ${attempts} attempts.<br>`+
+   `Rule of thumb: push Rifts <b>10+ levels above</b> your gem's rank for guaranteed (100%) upgrades; right at your rank (or up to +6) = 60%.<br>`+
+   `<span class="tdesc" style="font-size:11px">Note: the cumulative figure assumes odds stay constant across attempts. In reality each success bumps the gem's rank, which slightly lowers the odds on your next attempt within the same Rift.</span>`;
 }
 const GLOSSARY=[
  ["CDR (Cooldown Reduction)","Shortens skill cooldowns. Stacks multiplicatively, not additively — see the calculator above."],
@@ -1009,6 +1147,175 @@ function renderCompare(){
    '<table class="cmptable"><tr><th></th><th>'+CLASSES[aC].name+' — '+A.name+'</th><th>'+CLASSES[bC].name+' — '+B.name+'</th></tr>'+
    rows.map(r=>'<tr><td class="cmprow-label">'+r[0]+'</td><td>'+r[1][0]+'</td><td>'+r[1][1]+'</td></tr>').join('')+'</table>';
 }
+
+/* ============ GEAR ANALYZER ============
+   Item-slot comparison uses this site's real build data (reliable). Stat-target comparison
+   is a generic rule-of-thumb approximation — no verified per-build breakpoint dataset exists here. */
+function azKey(){return 'd3master_analyzer'}
+function azLoad(){try{return JSON.parse(localStorage.getItem(azKey()))||{}}catch(e){return {}}}
+function azSave(o){localStorage.setItem(azKey(),JSON.stringify(o))}
+function populateAzBuild(){
+  const sel=document.getElementById('azBuild');sel.innerHTML='';
+  ORDER.forEach(cId=>{const grp=document.createElement('optgroup');grp.label=CLASSES[cId].name;
+    CLASSES[cId].order.forEach(bId=>{const o=document.createElement('option');o.value=cId+'/'+bId;o.textContent=CLASSES[cId].builds[bId].name;grp.appendChild(o)});
+    sel.appendChild(grp);});
+  const saved=azLoad().build;sel.value=saved||(curClassId()+'/'+curBuildId(curClassId()));
+  if(!sel.value)sel.selectedIndex=0;
+}
+function onAzBuildChange(){const st=azLoad();st.build=document.getElementById('azBuild').value;azSave(st);renderAnalyzer()}
+function clearAnalyzer(){if(confirm('Clear all your entered gear?')){azSave({build:document.getElementById('azBuild').value});renderAnalyzer()}}
+function idealNameForSlot(b,slotKey){
+  const canon=poolKey(slotKey);
+  for(const g of b.legendaries){const gc=SLOTMAP[g[1]]||g[1];if(gc===canon)return splitNames(g[0])}
+  return [];
+}
+function renderAnalyzer(){
+  const [cId,bId]=(document.getElementById('azBuild').value||'').split('/');if(!cId)return;
+  const b=CLASSES[cId].builds[bId],st=azLoad();
+  const rowsHost=document.getElementById('azRows');
+  if(!rowsHost.dataset.built){
+    rowsHost.innerHTML=SLOTS.map(([key,label])=>{
+      const dlid='azdl_'+key;
+      return `<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+        <div style="width:78px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">${label}</div>
+        <input list="${dlid}" data-slot="${key}" placeholder="Type or pick an item…" oninput="onAzRowChange('${key}')" style="flex:1 1 200px;background:#120c08;border:1px solid var(--line);color:var(--gold2);padding:7px 9px;border-radius:6px;font-size:13px">
+        <datalist id="${dlid}"></datalist>
+        <label class="cdropt" style="padding:0"><input type="checkbox" data-anc="${key}" onchange="onAzRowChange('${key}')"> Ancient/Primal</label>
+        <span class="pill" data-status="${key}" style="min-width:110px;text-align:center"></span>
+      </div>`;
+    }).join('');
+    rowsHost.dataset.built='1';
+  }
+  SLOTS.forEach(([key])=>{
+    const dl=document.getElementById('azdl_'+key);
+    dl.innerHTML=itemsForSlot(cId,key).map(n=>'<option value="'+n+'">').join('');
+    const inp=rowsHost.querySelector('input[data-slot="'+key+'"]');
+    const chk=rowsHost.querySelector('input[data-anc="'+key+'"]');
+    if(document.activeElement!==inp)inp.value=(st[key]&&st[key].item)||'';
+    chk.checked=!!(st[key]&&st[key].anc);
+  });
+  document.getElementById('azMain').value=st.main||'';
+  document.getElementById('azCdr').value=st.cdr||'';
+  document.getElementById('azChc').value=st.chc||'';
+  document.getElementById('azChd').value=st.chd||'';
+  computeAzStatuses(cId,b,st);
+}
+function onAzRowChange(key){
+  const st=azLoad(),host=document.getElementById('azRows');
+  const inp=host.querySelector('input[data-slot="'+key+'"]'),chk=host.querySelector('input[data-anc="'+key+'"]');
+  st[key]={item:inp.value.trim(),anc:chk.checked};
+  st.build=document.getElementById('azBuild').value;
+  st.main=+document.getElementById('azMain').value||0;st.cdr=+document.getElementById('azCdr').value||0;
+  st.chc=+document.getElementById('azChc').value||0;st.chd=+document.getElementById('azChd').value||0;
+  azSave(st);
+  const [cId,bId]=st.build.split('/');computeAzStatuses(cId,CLASSES[cId].builds[bId],st);
+}
+function computeAzStatuses(cId,b,st){
+  const fixes=[];let filled=0;
+  SLOTS.forEach(([key,label])=>{
+    const entry=st[key]||{},ideal=idealNameForSlot(b,key);
+    const badge=document.querySelector('#azRows span[data-status="'+key+'"]');
+    if(!badge)return;
+    if(!entry.item){
+      badge.textContent='— empty —';badge.className='pill';badge.style.color='var(--muted)';
+      if(ideal.length)fixes.push({score:(key==='weapon'||key==='offhand')?100:70,text:`${label}: empty — build wants <b>${ideal.join(' or ')}</b>`});
+      return;
+    }
+    filled++;
+    const match=ideal.length && ideal.some(n=>n.toLowerCase()===entry.item.toLowerCase());
+    if(!ideal.length){
+      badge.textContent='Good';badge.className='pill med';badge.style.color='';
+    }else if(match&&entry.anc){
+      badge.textContent='Good';badge.className='pill med';badge.style.color='var(--setc)';
+    }else if(match&&!entry.anc){
+      badge.textContent='Needs Improvement';badge.className='pill';badge.style.color='var(--gold2)';
+      fixes.push({score:20,text:`${label}: right item but not Ancient/Primal — reroll or find an Ancient ${entry.item}`});
+    }else{
+      badge.textContent='Wrong Item';badge.className='pill prio';badge.style.color='';
+      fixes.push({score:80,text:`${label}: has <b>${entry.item}</b> — build wants <b>${ideal.join(' or ')}</b>`});
+    }
+  });
+  const howLower=(b.how||'').toLowerCase();
+  const statChecks=[];
+  if(/cooldown reduction|cdr/.test(howLower)){
+    if((st.cdr||0)<40)statChecks.push('This build leans on Cooldown Reduction — your entered '+(st.cdr||0)+'% is likely below a comfortable target (~40%+ is a common rule of thumb for CDR-hungry builds).');
+    else statChecks.push('CDR entered ('+st.cdr+'%) looks reasonable for a CDR-focused build.');
+  }
+  if((st.chc||0)>0&&(st.chd||0)>0){
+    const ratio=st.chd/Math.max(1,st.chc);
+    statChecks.push('CHC/CHD ratio ≈ 1:'+ratio.toFixed(1)+'. A common rule of thumb aims for roughly 1:10 (e.g. 50% CHC to ~500% CHD) — adjust gems/rerolls toward that if you\'re far off.');
+  }
+  document.getElementById('azStatCheck').innerHTML=statChecks.length?('<div class="howbox">'+statChecks.join('<br>')+'</div>'):'';
+  fixes.sort((a,b2)=>b2.score-a.score);
+  const top=fixes.slice(0,5);
+  document.getElementById('azFixFirst').innerHTML=top.length?top.map((f,i)=>`<div class="task"><div class="chk" style="background:var(--gold);color:#1a1006;display:flex;align-items:center;justify-content:center;font-weight:800">${i+1}</div><div><div class="ttitle">${f.text}</div></div></div>`).join(''):
+   (filled===0?'<div class="tdesc">Fill in your gear below to get a prioritized fix list.</div>':'<div class="tdesc">🎉 Nothing urgent — your entered gear matches this build well!</div>');
+}
+
+/* ============ SEASON LAUNCH ============
+   Plain JS data objects (SEASON_GLANCE / LIVEBLOG_ENTRIES) — edit these directly to post
+   updates, same pattern as CLASSES/JOURNEY elsewhere in this file. No HTML editing needed. */
+const SEASON_GLANCE={
+ theme:"Shades of the Nephalem",seasonNum:39,
+ start:"June 26, 2026 · 5:00 PM PDT / 8:00 PM EDT / 1:00 AM BST (check your local time — Blizzard posts exact per-region times)",
+ mechanic:"Kanai's Cube gets a bonus 4th slot (any power, no duplicates) + activating Shrines/Pylons spawns a scaled shadow clone of your class for 60s.",
+ haedrig:ORDER.map(cId=>CLASSES[cId].name+': '+CLASSES[cId].freeSet).join(' · '),
+ rewards:"Season Journey Conqueror tier grants +1 stash tab; Guardian tier grants exclusive seasonal portrait/pennant cosmetics.",
+};
+const LIVEBLOG_ENTRIES=[
+ {date:"2026-06-26",title:"Season 39 is live",body:"Shades of the Nephalem has returned (rerun of the Season 22 theme: bonus Cube slot + Shadow Clones). Haedrig's Gift sets and starter builds are in the Build Guide tab.",tags:["Launch"]},
+ {date:"2026-06-24",title:"Season 39 preview posted",body:"Blizzard confirmed the theme and start time ahead of launch.",tags:["Announcement"]},
+];
+function renderLaunchGlance(){
+  const rows=[["Season","39 — "+SEASON_GLANCE.theme],["Starts",SEASON_GLANCE.start],["Mechanic",SEASON_GLANCE.mechanic],["Haedrig's Gift sets",SEASON_GLANCE.haedrig],["Rewards",SEASON_GLANCE.rewards]];
+  document.getElementById('launchGlance').innerHTML=rows.map(r=>'<div class="pgncat"><b>'+r[0]+'</b><span>'+r[1]+'</span></div>').join('');
+  document.getElementById('launchUpdated').innerHTML='Last updated: <b>'+(LIVEBLOG_ENTRIES[0]?LIVEBLOG_ENTRIES[0].date:'—')+'</b> · this page is a hand-updated feed, not auto-refreshing.';
+}
+function renderLaunchFeed(){
+  document.getElementById('launchFeed').innerHTML=LIVEBLOG_ENTRIES.map(e=>
+   `<div class="task" style="cursor:default"><div><div class="ttitle">${e.title} <span class="slot">· ${e.date}</span> ${(e.tags||[]).map(t=>'<span class="pill med">'+t+'</span>').join(' ')}</div><div class="tdesc">${e.body}</div></div></div>`
+  ).join('');
+}
+function tierKey(){return 'd3master_tierlist'}
+function seedTierList(){
+  const list=[];ORDER.forEach(cId=>{CLASSES[cId].order.forEach(bId=>{const b=CLASSES[cId].builds[bId];list.push({cls:cId,bId,tier:b.free?'A':'B'})})});
+  return list;
+}
+function renderLaunchTierList(){
+  let list;try{list=JSON.parse(localStorage.getItem(tierKey()))}catch(e){}
+  if(!list||!list.length)list=seedTierList();
+  const host=document.getElementById('launchTierList');host.innerHTML='';
+  ['S','A','B','C'].forEach(tier=>{
+    const items=list.filter(x=>x.tier===tier);if(!items.length)return;
+    const row=document.createElement('div');row.style.marginBottom='10px';
+    row.innerHTML='<div class="sub" style="margin-bottom:6px">Tier '+tier+'</div>'+
+     items.map((it,idx)=>{
+       const b=CLASSES[it.cls].builds[it.bId];
+       return `<div class="task" style="cursor:default"><div style="flex:1"><div class="ttitle">${b.name} <span class="slot">· ${CLASSES[it.cls].name}</span></div></div>
+        <div style="display:flex;gap:4px">
+         <button class="btn" style="padding:3px 8px" onclick="moveTier('${it.cls}','${it.bId}',-1)">▲</button>
+         <button class="btn" style="padding:3px 8px" onclick="moveTier('${it.cls}','${it.bId}',1)">▼</button>
+        </div></div>`;
+     }).join('');
+    host.appendChild(row);
+  });
+}
+const TIERORDER=['S','A','B','C'];
+function moveTier(cId,bId,dir){
+  let list;try{list=JSON.parse(localStorage.getItem(tierKey()))}catch(e){}
+  if(!list||!list.length)list=seedTierList();
+  const item=list.find(x=>x.cls===cId&&x.bId===bId);
+  const i=TIERORDER.indexOf(item.tier);const ni=Math.max(0,Math.min(TIERORDER.length-1,i+dir));
+  item.tier=TIERORDER[ni];
+  localStorage.setItem(tierKey(),JSON.stringify(list));renderLaunchTierList();
+}
+function initLaunch(){
+  document.title='Diablo 3 Season 39: '+SEASON_GLANCE.theme+' — Start Time, Patch Notes, Best Builds | Season Forge';
+  let m=document.querySelector('meta[name="description"]');if(!m){m=document.createElement('meta');m.name='description';document.head.appendChild(m)}
+  m.content='Diablo 3 Season 39 ('+SEASON_GLANCE.theme+') start time, live patch notes, and the best builds per class — updated as the season unfolds.';
+  renderLaunchGlance();renderLaunchFeed();renderLaunchTierList();
+}
+
 function renderStartHere(){
   const cId=curClassId(),c=CLASSES[cId];
   const freeId=c.order.find(id=>c.builds[id].free)||c.order[0];const fb=c.builds[freeId];
@@ -1140,7 +1447,7 @@ function labPortrait(cls,gender){
    +'</svg>';
 }
 let ITEMDB=[],ITEMBYNAME={};
-function loadItemDB(){fetch('items.json').then(r=>r.json()).then(d=>{ITEMDB=d;ITEMBYNAME={};d.forEach(it=>{ITEMBYNAME[it.n]=it});if(LAB)renderLab()}).catch(()=>{})}
+function loadItemDB(){fetch('items.json').then(r=>r.json()).then(d=>{ITEMDB=d;ITEMBYNAME={};d.forEach(it=>{ITEMBYNAME[it.n]=it});if(LAB)renderLab();if(document.getElementById('azBuild'))renderAnalyzer()}).catch(()=>{})}
 function iconFor(n){const it=ITEMBYNAME[n];return it&&it.i?('icons/'+it.i):null}
 function qualOf(n){const it=ITEMBYNAME[n];return it?it.q:null}
 function itemsForSlot(cls,slotKey){
@@ -1275,8 +1582,10 @@ function goToView(view,scrollTop){
   document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id===view));
   const activeTab=document.querySelector('.tab[data-view="'+view+'"]');
   document.getElementById('tabdesc').textContent=activeTab?activeTab.dataset.desc:'';
+  if(view==='launch'){initLaunch()}else if(window.ORIGINAL_TITLE){document.title=window.ORIGINAL_TITLE}
   if(scrollTop!==false)window.scrollTo({top:0,behavior:'smooth'});
 }
+window.ORIGINAL_TITLE=document.title;
 document.querySelectorAll(".tab").forEach(t=>{t.onclick=()=>goToView(t.dataset.view)});
 document.querySelectorAll(".bnitem").forEach(t=>{t.onclick=()=>goToView(t.dataset.view)});
 goToView('guide',false);
@@ -1305,7 +1614,7 @@ function ding(){if(!SFX)return;try{_ac=_ac||new (window.AudioContext||window.web
 (function countdown(){const end=new Date(2026,8,27,17,0,0),now=new Date();const days=Math.max(0,Math.ceil((end-now)/86400000));document.getElementById('countdown').innerHTML=days>0?`Season 39 · <b>~${days} days</b> left (est.)`:'Season 39 has ended';})();
 
 /* ---- tools init ---- */
-renderCDRSources();renderCDRPresets();updateAugClass();calcShards();calcCDR();calcAug();calcGemOdds();renderGap();updateSfxBtn();initLab();loadItemDB();renderGlossary();populateCompareSelects();renderCompare();
+renderCDRSources();renderCDRPresets();updateAugClass();calcShards();calcCDR();calcAug();calcGemOdds();renderGap();updateSfxBtn();initLab();loadItemDB();renderGlossary();populateCompareSelects();renderCompare();populateAzBuild();renderAnalyzer();
 try{const gs=JSON.parse(localStorage.getItem('d3master_gapstats'))||{};if(gs.cdr!=null)document.getElementById('gapcdr').value=gs.cdr;if(gs.main!=null)document.getElementById('gapmain').value=gs.main;}catch(e){}
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}</script>

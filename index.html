@@ -481,6 +481,18 @@
     <button class="btn" onclick="clearAnalyzer()">✕ Clear my entries</button>
   </div>
   <div class="card full" style="margin-bottom:14px">
+    <h2>🔄 Sync My Character <span class="info" tabindex="0" data-tip="Pulls your real seasonal character's equipped gear from the Battle.net D3 Community API via a small proxy, then auto-fills the gear rows below. Your Battle.net profile must have public progress sharing enabled.">?</span></h2>
+    <div class="howbox">Your Battle.net profile must have <b>public profile/progress sharing</b> enabled (Battle.net account → Settings → D3 → Sharing) or this will come back empty. This reflects your <b>last in-game save</b>, not real-time state.</div>
+    <div class="pickers" style="margin-bottom:8px">
+      <div style="flex:1 1 200px"><label>BattleTag</label><input id="syncTag" placeholder="Ashervox#1234" style="width:100%;background:#120c08;border:1px solid var(--line);color:var(--gold2);padding:8px;border-radius:6px"></div>
+      <div style="flex:0 1 120px"><label>Region</label><select id="syncRegion" class="bigsel" style="width:100%"><option value="us">Americas</option><option value="eu">Europe</option><option value="kr">Asia</option><option value="tw">Taiwan/HK</option></select></div>
+    </div>
+    <button class="bigcta" style="padding:9px 20px;font-size:13px" onclick="syncFetchCareer()">🔄 Fetch my heroes</button>
+    <span id="syncMsg" class="slot" style="margin-left:8px"></span>
+    <div id="syncHeroList" style="margin-top:12px"></div>
+    <div id="syncLastUpdated" class="tdesc" style="margin-top:8px"></div>
+  </div>
+  <div class="card full" style="margin-bottom:14px">
     <h2>🎯 Fix This First <span class="info" tabindex="0" data-tip="Ranked by impact: a missing build-defining item outweighs a missing Ancient rarity flag, which outweighs a minor stat gap.">?</span></h2>
     <div id="azFixFirst"></div>
   </div>
@@ -1189,6 +1201,73 @@ function populateAzBuild(){
 }
 function onAzBuildChange(){const st=azLoad();st.build=document.getElementById('azBuild').value;azSave(st);renderAnalyzer()}
 function clearAnalyzer(){if(confirm('Clear all your entered gear?')){azSave({build:document.getElementById('azBuild').value});renderAnalyzer()}}
+
+/* ============ LIVE CHARACTER SYNC ============
+   Calls the Cloudflare Worker proxy (holds the Battle.net API secret) which fetches the
+   Community API career/hero profile. Blizzard's exact hero-item field names aren't fully
+   documented publicly, so parsing below tries several known/likely field variants and
+   flags anything it can't confidently map rather than silently guessing wrong. */
+const SYNC_WORKER_URL='https://season-forge-api.ashervox.workers.dev';
+const SYNC_CLASS_MAP={barbarian:'barbarian','demon-hunter':'demonhunter',demonhunter:'demonhunter',monk:'monk','witch-doctor':'witchdoctor',witchdoctor:'witchdoctor',wizard:'wizard',crusader:'crusader',necromancer:'necromancer'};
+const SYNC_SLOT_MAP={head:'helm',helm:'helm',torso:'chest',chest:'chest',feet:'boots',boots:'boots',hands:'gloves',gloves:'gloves',legs:'pants',pants:'pants',shoulders:'shoulders',mainHand:'weapon',main_hand:'weapon',offHand:'offhand',off_hand:'offhand',neck:'amulet',amulet:'amulet',bracers:'bracers',waist:'belt',belt:'belt',leftFinger:'ring1',left_finger:'ring1',rightFinger:'ring2',right_finger:'ring2'};
+function syncAncientFlag(it){
+  if(typeof it.isAncient==='boolean')return it.isAncient||it.isPrimalAncient;
+  if(typeof it.ancientRank==='number')return it.ancientRank>0;
+  if(typeof it.tier==='string')return /ancient|primal/i.test(it.tier);
+  return null; // unknown — flagged in UI rather than guessed
+}
+async function syncFetchCareer(){
+  const tag=document.getElementById('syncTag').value.trim(),region=document.getElementById('syncRegion').value;
+  const msg=document.getElementById('syncMsg');
+  if(!tag||tag.indexOf('#')<0){msg.textContent='Enter a full BattleTag like Name#1234.';return}
+  msg.textContent='Fetching…';document.getElementById('syncHeroList').innerHTML='';
+  try{
+    const r=await fetch(SYNC_WORKER_URL+'?battletag='+encodeURIComponent(tag)+'&region='+region);
+    const data=await r.json();
+    if(!r.ok){msg.textContent='⚠ '+(data.error||'Could not fetch that profile.');return}
+    const heroes=data.heroes||[];
+    if(!heroes.length){msg.textContent='No heroes found on that profile.';return}
+    msg.textContent=heroes.length+' hero(es) found — pick one to sync:';
+    document.getElementById('syncHeroList').innerHTML=heroes.map(h=>{
+      const cls=SYNC_CLASS_MAP[(h['class']||'').toLowerCase()]||h['class'];
+      return `<div class="opt" style="margin-bottom:6px" onclick="syncSelectHero('${tag.replace(/'/g,"\\'")}','${region}',${h.id},'${cls}')">
+        <b>${h.name}</b> — ${CLASSES[cls]?CLASSES[cls].name:h['class']} · Lv${h.level}${h.seasonal?' · Seasonal':''}${h.hardcore?' · Hardcore':''}
+      </div>`;
+    }).join('');
+  }catch(e){msg.textContent='⚠ Network error reaching the sync service. Try again in a moment.'}
+}
+async function syncSelectHero(tag,region,heroId,cls){
+  const msg=document.getElementById('syncMsg');msg.textContent='Loading hero gear…';
+  try{
+    const r=await fetch(SYNC_WORKER_URL+'?battletag='+encodeURIComponent(tag)+'&region='+region+'&hero='+heroId);
+    const hero=await r.json();
+    if(!r.ok){msg.textContent='⚠ '+(hero.error||'Could not load that hero.');return}
+    if(CLASSES[cls]){
+      const opts=[...document.getElementById('azBuild').options];
+      const match=opts.find(o=>o.value.indexOf(cls+'/')===0);
+      if(match){document.getElementById('azBuild').value=match.value;onAzBuildChange()}
+    }
+    const st=azLoad();let unknownAncients=0,mapped=0;
+    const items=hero.items||{};
+    Object.keys(items).forEach(k=>{
+      const slot=SYNC_SLOT_MAP[k];if(!slot)return;
+      const it=items[k];if(!it||!it.name)return;
+      const anc=syncAncientFlag(it);if(anc===null)unknownAncients++;
+      st[slot]={item:it.name,anc:!!anc};mapped++;
+    });
+    if(hero.stats){
+      const s=hero.stats;
+      if(s.primaryStat!=null)st.main=s.primaryStat;
+      if(s.cooldownReduction!=null)st.cdr=Math.round(s.cooldownReduction);
+      if(s.criticalHitChance!=null)st.chc=Math.round(s.criticalHitChance);
+      if(s.criticalHitDamage!=null)st.chd=Math.round(s.criticalHitDamage);
+    }
+    azSave(st);
+    renderAnalyzer();
+    msg.textContent='✅ Synced '+mapped+' item(s).'+(unknownAncients?' ('+unknownAncients+' Ancient/Primal status unknown — Blizzard\'s exact field for this wasn\'t confirmed, please double check those manually.)':'');
+    document.getElementById('syncLastUpdated').textContent=hero.lastUpdated?('Last synced from your save: '+new Date(hero.lastUpdated*1000).toLocaleString()+' — this is your last in-game save, not live.'):'Synced just now (Blizzard did not report a save timestamp for this hero).';
+  }catch(e){msg.textContent='⚠ Network error reaching the sync service. Try again in a moment.'}
+}
 function idealNameForSlot(b,slotKey){
   const canon=poolKey(slotKey);
   for(const g of b.legendaries){const gc=SLOTMAP[g[1]]||g[1];if(gc===canon)return splitNames(g[0])}

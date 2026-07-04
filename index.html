@@ -34,14 +34,43 @@
     background-image:radial-gradient(circle at 50% -10%, var(--tint) 0%, var(--bg) 55%);min-height:100vh;transition:background-image .4s;}
   .wrap,header,.tabs{position:relative;z-index:1}
   header{text-align:center;padding:26px 16px 12px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(40,24,12,.6),transparent)}
-  header h1{margin:0;font-size:28px;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);text-shadow:0 0 18px rgba(201,162,75,.45);font-weight:700}
-  header p{margin:6px 0 0;color:var(--muted);font-size:13px;letter-spacing:1px}
-  .tabs{display:flex;justify-content:center;gap:10px;margin:16px auto 0;flex-wrap:wrap;max-width:900px;padding:0 12px}
-  .tab{cursor:pointer;padding:11px 22px;border:1px solid var(--line);border-radius:6px 6px 0 0;background:var(--panel);color:var(--muted);font-size:14px;letter-spacing:1px;text-transform:uppercase;transition:.18s;border-bottom:none}
-  .tab:hover{color:var(--gold)}
-  .tab.active{background:var(--panel2);color:var(--gold2);box-shadow:0 -3px 14px rgba(201,162,75,.18) inset}
-  .wrap{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
-  .view{display:none}.view.active{display:block;animation:fade .35s ease}
+  header h1{margin:0;font-size:32px;letter-spacing:3px;text-transform:uppercase;color:var(--gold2);text-shadow:0 0 24px rgba(201,162,75,.55),0 0 60px rgba(201,162,75,.15);font-weight:800;background:linear-gradient(90deg,var(--gold2),var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text}
+  header p{margin:8px 0 0;color:var(--muted);font-size:13.5px;letter-spacing:1px}
+  .tabs{display:flex;justify-content:center;gap:8px;margin:20px auto 0;flex-wrap:wrap;max-width:920px;padding:0 12px}
+  .tab{cursor:pointer;padding:13px 20px;border:1px solid var(--line);border-radius:10px 10px 0 0;background:var(--panel);color:var(--muted);font-size:14px;letter-spacing:.5px;font-weight:600;transition:.2s;border-bottom:none;display:flex;align-items:center;gap:7px}
+  .tab .tabicon{font-size:16px}
+  .tab:hover{color:var(--gold);background:var(--panel2);transform:translateY(-2px)}
+  .tab.active{background:var(--panel2);color:var(--gold2);box-shadow:0 -4px 18px rgba(201,162,75,.22) inset,0 2px 0 var(--gold2);transform:translateY(-1px)}
+  .tabdesc{text-align:center;font-size:12.5px;color:var(--muted);max-width:640px;margin:10px auto 0;padding:0 16px;min-height:18px}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px 16px 90px}
+  .view{display:none}.view.active{display:block;animation:fade .4s cubic-bezier(.2,.8,.3,1)}
+  /* welcome modal */
+  .welcome{position:fixed;inset:0;background:rgba(5,3,2,.86);z-index:80;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+  .welcome.open{display:flex}
+  .welcomebox{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--gold);border-radius:16px;max-width:540px;width:100%;padding:30px 28px;box-shadow:0 30px 90px rgba(0,0,0,.7),0 0 60px rgba(201,162,75,.12);text-align:center;animation:popin .35s cubic-bezier(.2,.8,.3,1)}
+  @keyframes popin{from{opacity:0;transform:scale(.92) translateY(10px)}to{opacity:1;transform:none}}
+  .welcomebox h2{margin:0 0 6px;font-size:22px;letter-spacing:1px;color:var(--gold2);text-shadow:0 0 16px rgba(201,162,75,.4)}
+  .welcomebox p{color:var(--txt);font-size:14px;line-height:1.6;margin:14px 0}
+  .welcomebox .steps{text-align:left;background:rgba(201,162,75,.07);border-radius:10px;padding:14px 18px;margin:16px 0;font-size:13.5px;line-height:1.9}
+  .welcomebox .steps b{color:var(--gold2)}
+  .bigcta{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1006;border:none;padding:13px 28px;border-radius:10px;font-size:15px;font-weight:800;letter-spacing:.5px;cursor:pointer;box-shadow:0 6px 20px rgba(201,162,75,.35);transition:.15s;margin-top:6px}
+  .bigcta:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(201,162,75,.45)}
+  .skiplink{display:block;margin-top:14px;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;background:none;border:none}
+  .skiplink:hover{color:var(--gold)}
+  /* floating help button */
+  .fabhelp{position:fixed;bottom:20px;right:20px;z-index:40;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1006;width:52px;height:52px;border-radius:50%;border:none;font-size:22px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 0 3px rgba(201,162,75,.15);display:flex;align-items:center;justify-content:center;transition:.2s}
+  .fabhelp:hover{transform:scale(1.08) translateY(-2px)}
+  /* mobile bottom nav */
+  .bottomnav{display:none}
+  @media(max-width:640px){
+    .tabs{display:none}
+    .bottomnav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:35;background:var(--panel2);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(0,0,0,.4);padding:4px 2px calc(4px + env(safe-area-inset-bottom))}
+    .bottomnav .bnitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px;color:var(--muted);font-size:9.5px;letter-spacing:.3px;cursor:pointer;border:none;background:none;font-family:inherit}
+    .bottomnav .bnitem .tabicon{font-size:19px}
+    .bottomnav .bnitem.active{color:var(--gold2)}
+    .wrap{padding-bottom:80px}
+    .fabhelp{bottom:76px;width:46px;height:46px;font-size:19px}
+  }
   @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
   .pickers{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:10px;padding:16px 18px}
   .pickers label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
@@ -181,10 +210,28 @@
 </header>
 
 <div class="tabs">
-  <div class="tab active" data-view="guide">Build Guide</div>
-  <div class="tab" data-view="lab">Build Lab</div>
-  <div class="tab" data-view="journey">Season Journey</div>
-  <div class="tab" data-view="tools">Tools & Reference</div>
+  <div class="tab active" data-view="guide" data-desc="Pick your class, pick a build, get skills/gear/checklist. Start here."><span class="tabicon">🎯</span>Build Guide</div>
+  <div class="tab" data-view="lab" data-desc="Try any gear/skill combo on a full-body character and see what it matches."><span class="tabicon">🧪</span>Build Lab</div>
+  <div class="tab" data-view="journey" data-desc="Track your Season Journey chapters and Conquests, checkbox by checkbox."><span class="tabicon">🗺️</span>Season Journey</div>
+  <div class="tab" data-view="tools" data-desc="Calculators, glossary, and the Season 39 gimmicks (Cube slot 4, Shadow Clones)."><span class="tabicon">🧰</span>Tools & Reference</div>
+</div>
+<div class="tabdesc" id="tabdesc"></div>
+
+<button class="fabhelp" title="Help & Glossary" onclick="goToGlossary()">?</button>
+
+<div class="welcome" id="welcome">
+  <div class="welcomebox">
+    <h2>⚔ Welcome, Nephalem</h2>
+    <p>This is a free, offline-friendly guide for <b>all 7 Diablo 3 classes</b> — Season 39. No login, no ads. Everything you check off saves right on this device.</p>
+    <div class="steps">
+      <b>1.</b> Pick a class & a beginner-friendly build (⭐ = your free Haedrig's set)<br>
+      <b>2.</b> Follow the leveling plan &amp; upgrade checklist<br>
+      <b>3.</b> Track your Season Journey + Conquests<br>
+      <b>4.</b> Experiment freely in the Build Lab, use the calculators in Tools
+    </div>
+    <button class="bigcta" onclick="closeWelcome(true)">🚀 Show me my Start-Here plan</button>
+    <button class="skiplink" onclick="closeWelcome(false)">Skip — let me explore on my own</button>
+  </div>
 </div>
 
 <div class="wrap">
@@ -194,12 +241,12 @@
   <div class="card full" style="margin-bottom:14px">
     <h2>🆕 New season? Start Here</h2>
     <div class="tdesc" style="margin-bottom:8px">Get a literal step-by-step funnel for your <b>currently selected class</b>: beginner build → Haedrig's plan → leveling route → first GR target.</div>
-    <button class="btn" onclick="renderStartHere()">Show my start-here plan</button>
+    <button class="bigcta" style="padding:10px 22px;font-size:13.5px" onclick="renderStartHere()">🚀 Show my start-here plan</button>
     <div id="startherebox" style="margin-top:10px"></div>
   </div>
   <div class="pickers">
-    <div style="flex:1 1 260px"><label>Class</label><div class="chiprow" id="classbtns"></div></div>
-    <div style="flex:1 1 260px"><label>Goal Build</label><div class="chiprow" id="buildbtns"></div></div>
+    <div style="flex:1 1 260px"><label><span style="color:var(--gold2)">① </span>Class</label><div class="chiprow" id="classbtns"></div></div>
+    <div style="flex:1 1 260px"><label><span style="color:var(--gold2)">② </span>Goal Build <span class="slot">(★ = free set)</span></label><div class="chiprow" id="buildbtns"></div></div>
   </div>
   <div class="progwrap">
     <div class="progbar"><div class="progfill" id="gprog"></div></div>
@@ -406,6 +453,13 @@
 
 </div>
 <footer>Diablo 3 Season 39 · all data from current Maxroll / Icy Veins guides · offline · progress saved per device</footer>
+
+<div class="bottomnav" id="bottomnav">
+  <button class="bnitem active" data-view="guide"><span class="tabicon">🎯</span>Guide</button>
+  <button class="bnitem" data-view="lab"><span class="tabicon">🧪</span>Lab</button>
+  <button class="bnitem" data-view="journey"><span class="tabicon">🗺️</span>Journey</button>
+  <button class="bnitem" data-view="tools"><span class="tabicon">🧰</span>Tools</button>
+</div>
 
 <script>
 /* ============ DATA ============ */
@@ -1214,12 +1268,29 @@ function copyLabCode(){const code=btoa(encodeURIComponent(JSON.stringify(LAB)));
 function loadLabCode(){try{const p=JSON.parse(decodeURIComponent(atob(document.getElementById('labcode').value.trim())));if(!p.cls||!CLASSES[p.cls])throw'bad';LAB=Object.assign(labDefault(),p);labSave();renderLab();document.getElementById('labmsg').textContent='Loaded!'}catch(e){document.getElementById('labmsg').textContent='Invalid build code.'}}
 function initLab(){LAB=labLoad();if(!LAB||!LAB.cls||!CLASSES[LAB.cls])LAB=labDefault();renderLab()}
 
-/* ---- tab switching ---- */
-document.querySelectorAll(".tab").forEach(t=>{t.onclick=()=>{
-  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-  document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
-  t.classList.add("active");document.getElementById(t.dataset.view).classList.add("active");
-}});
+/* ---- tab switching (top tabs + mobile bottom nav share one function) ---- */
+function goToView(view,scrollTop){
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.view===view));
+  document.querySelectorAll(".bnitem").forEach(x=>x.classList.toggle("active",x.dataset.view===view));
+  document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id===view));
+  const activeTab=document.querySelector('.tab[data-view="'+view+'"]');
+  document.getElementById('tabdesc').textContent=activeTab?activeTab.dataset.desc:'';
+  if(scrollTop!==false)window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll(".tab").forEach(t=>{t.onclick=()=>goToView(t.dataset.view)});
+document.querySelectorAll(".bnitem").forEach(t=>{t.onclick=()=>goToView(t.dataset.view)});
+goToView('guide',false);
+
+/* ---- welcome modal ---- */
+function closeWelcome(startHere){
+  document.getElementById('welcome').classList.remove('open');
+  localStorage.setItem('d3master_seen_welcome','1');
+  if(startHere){goToView('guide');setTimeout(()=>{renderStartHere();document.getElementById('startherebox').scrollIntoView({behavior:'smooth',block:'center'})},150)}
+}
+if(!localStorage.getItem('d3master_seen_welcome'))document.getElementById('welcome').classList.add('open');
+
+/* ---- floating help button -> Tools > Glossary ---- */
+function goToGlossary(){goToView('tools');setTimeout(()=>{const g=document.getElementById('glossary');if(g)g.scrollIntoView({behavior:'smooth',block:'start'})},150)}
 
 /* ---- SFX (WebAudio ding) ---- */
 let SFX=localStorage.getItem('d3master_sfx')!=='off',_ac;

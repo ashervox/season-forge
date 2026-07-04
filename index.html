@@ -57,6 +57,13 @@
   .bigcta:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(201,162,75,.45)}
   .skiplink{display:block;margin-top:14px;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;background:none;border:none}
   .skiplink:hover{color:var(--gold)}
+  /* Guardian celebration */
+  .confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:95;overflow:hidden}
+  .confetti-piece{position:absolute;top:-20px;width:9px;height:14px;opacity:.95;animation:confetti-fall linear forwards}
+  @keyframes confetti-fall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(108vh) rotate(600deg);opacity:.3}}
+  .guardianbox{max-width:480px;text-align:center}
+  .guardianbox h2{font-size:26px;margin:6px 0 4px}
+  .guardiantrophy{font-size:56px;line-height:1;margin-bottom:6px;filter:drop-shadow(0 4px 14px rgba(201,162,75,.5))}
   /* floating help button */
   .fabhelp{position:fixed;bottom:20px;right:20px;z-index:40;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1006;width:52px;height:52px;border-radius:50%;border:none;font-size:22px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 0 3px rgba(201,162,75,.15);display:flex;align-items:center;justify-content:center;transition:.2s}
   .fabhelp:hover{transform:scale(1.08) translateY(-2px)}
@@ -236,6 +243,18 @@
   </div>
 </div>
 
+<div class="confetti-wrap" id="confetti"></div>
+<div class="welcome" id="guardianModal">
+  <div class="welcomebox guardianbox">
+    <div class="guardiantrophy">🏆</div>
+    <h2>Guardian Achieved!</h2>
+    <p>You've completed the full Season 39 Journey as a <b id="guardianClass"></b>. That's the top tier — exclusive cosmetics unlocked in-game.</p>
+    <button class="bigcta" onclick="copyGuardianBadge()">📋 Copy shareable badge</button>
+    <div class="tdesc" id="guardianCopyMsg" style="margin-top:8px"></div>
+    <button class="skiplink" onclick="closeGuardianModal()">Close</button>
+  </div>
+</div>
+
 <div class="wrap">
 
 <!-- ===== BUILD GUIDE ===== -->
@@ -245,6 +264,12 @@
     <div class="tdesc" style="margin-bottom:8px">Get a literal step-by-step funnel for your <b>currently selected class</b>: beginner build → Haedrig's plan → leveling route → first GR target.</div>
     <button class="bigcta" style="padding:10px 22px;font-size:13.5px" onclick="renderStartHere()">🚀 Show my start-here plan</button>
     <div id="startherebox" style="margin-top:10px"></div>
+  </div>
+  <div class="card full" style="margin-bottom:14px">
+    <h2>⏱ Session Planner <span class="info" tabindex="0" data-tip="A rule-of-thumb route for your play session — not a perfect optimizer, just a sensible order based on your Journey progress, gear gaps, and how much time you've got.">?</span></h2>
+    <div class="tdesc" style="margin-bottom:8px">Tell me how long you've got, get a suggested route for this session.</div>
+    <div class="chiprow" id="spTimeBtns" style="margin-bottom:10px"></div>
+    <div id="spOut"></div>
   </div>
   <div class="pickers">
     <div style="flex:1 1 260px"><label><span style="color:var(--gold2)">① </span>Class</label><div class="chiprow" id="classbtns"></div></div>
@@ -345,6 +370,7 @@
         <button class="btn" onclick="openLoadMeta()">⬇ Load a meta build</button>
         <button class="btn" onclick="clearLab()">✕ Clear</button>
         <button class="btn" onclick="copyLabCode()">🔗 Copy build code</button>
+        <button class="bigcta" style="padding:8px 16px;font-size:12.5px" onclick="copyShareLink()">🌐 Copy shareable link</button>
       </div>
       <textarea id="labcode" placeholder="Paste a build code, then click Load code…" style="width:100%;min-height:52px;background:#120c08;border:1px solid var(--line);color:var(--gold2);border-radius:6px;padding:8px;font-size:11px"></textarea>
       <div style="margin-top:6px"><button class="btn" onclick="loadLabCode()">Load code</button> <span id="labmsg" class="slot"></span></div>
@@ -354,6 +380,7 @@
   <div class="labsec"><h3>Legendary Gems &amp; Kanai's Cube</h3><div class="slotgrid" id="labgemcube"></div></div>
   <div class="labsec"><h3>Active Skills</h3><div class="slotgrid" id="labskills"></div></div>
   <div class="labsec"><h3>Passives</h3><div class="slotgrid" id="labpassives"></div></div>
+  <div id="labwarnings" style="margin-top:14px"></div>
 </div>
 
 <!-- picker modal -->
@@ -446,6 +473,10 @@
       </div>
       <div id="gapitems"></div>
       <div class="calcout" id="gapout"></div>
+    </div>
+    <div class="card full">
+      <h2>🎯 Next Best Upgrade <span class="info" tabindex="0" data-tip="Ranks your top 3 missing items by typical impact — weapon/off-hand slots carry a build's core damage multiplier, jewelry is usually a smaller boost, armor slots smaller still. This is a heuristic estimate, not a simulated DPS calculation.">?</span></h2>
+      <div id="gapranker"></div>
     </div>
     <div class="card full">
       <h2>Export / Import Progress <span class="info" tabindex="0" data-tip="Saves all your progress (build checklists + Season Journey) into a code you can move to another device. Paste a friend's code and hit Compare to see your Journeys side by side without overwriting yours.">?</span></h2>
@@ -555,6 +586,8 @@
 <script>
 /* ============ DATA ============ */
 const ORDER=["barbarian","crusader","demonhunter","monk","witchdoctor","wizard","necromancer"];
+/* "Next Best Upgrade" heuristic weights — raw slot labels as used in build .legendaries data. Estimate only. */
+const UPGRADE_WEIGHT={weapon:[35,45],offhand:[25,35],shield:[25,35],mojo:[25,35],quiver:[20,30],source:[20,30],helm:[10,18],shoulders:[8,14],amulet:[12,20],ring:[12,20],chest:[8,14],gloves:[8,14],bracers:[8,14],belt:[8,14],pants:[6,12],boots:[6,12]};
 
 /* Season 39 theme: bonus 4th Kanai's Cube slot — ANY power (weapon/armor/jewelry), doesn't stack with a duplicate you already have equipped/cubed. */
 const CUBE4_RULE="This slot accepts ANY power — weapon, armor, or jewelry. It will NOT stack if you duplicate a power already equipped or cubed elsewhere, so pick something new.";
@@ -1038,9 +1071,42 @@ function renderJourney(){
     card.innerHTML=`<h2>${t.tier}${t.reward?`<span class="reward">${t.reward}</span>`:""}</h2><div class="tierprog">${td} / ${t.objs.length}</div>${rows}`;
     host.appendChild(card);
   });
-  host.querySelectorAll(".obj").forEach(el=>{el.onclick=()=>{const s=jnyLoad("journey");s[el.dataset.k]=!s[el.dataset.k];jnySave("journey",s);renderJourney()}});
+  host.querySelectorAll(".obj").forEach(el=>{el.onclick=()=>{const s=jnyLoad("journey");s[el.dataset.k]=!s[el.dataset.k];jnySave("journey",s);renderJourney();checkGuardianCelebration()}});
   document.getElementById("jnyprog").style.width=(total?done/total*100:0)+"%";
   document.getElementById("jnyprogtxt").textContent=`${done} / ${total} journey objectives complete`;
+}
+/* ---- Guardian celebration: fires once when the Guardian tier's objectives are all checked ---- */
+function checkGuardianCelebration(){
+  const gi=JOURNEY.findIndex(t=>t.tier==='Guardian');if(gi<0)return;
+  const st=jnyLoad('journey'),t=JOURNEY[gi];
+  const allDone=t.objs.every((o,oi)=>st[gi+'-'+oi]);
+  if(!allDone)return;
+  if(localStorage.getItem('d3master_guardian_celebrated'))return;
+  localStorage.setItem('d3master_guardian_celebrated','1');
+  showGuardianCelebration();
+}
+function showGuardianCelebration(){
+  const cId=curClassId(),c=CLASSES[cId];
+  document.getElementById('guardianClass').textContent=c.name;
+  const host=document.getElementById('confetti');host.innerHTML='';
+  const colors=[THEMES[cId]?THEMES[cId][0]:'#c9a24b',THEMES[cId]?THEMES[cId][1]:'#e8c878','#ffffff'];
+  for(let i=0;i<70;i++){
+    const p=document.createElement('div');p.className='confetti-piece';
+    p.style.left=(Math.random()*100)+'%';
+    p.style.background=colors[i%colors.length];
+    p.style.animationDelay=(Math.random()*0.8)+'s';
+    p.style.animationDuration=(2.2+Math.random()*1.6)+'s';
+    p.style.transform='rotate('+Math.floor(Math.random()*360)+'deg)';
+    host.appendChild(p);
+  }
+  document.getElementById('guardianModal').classList.add('open');
+}
+function closeGuardianModal(){document.getElementById('guardianModal').classList.remove('open')}
+function copyGuardianBadge(){
+  const c=CLASSES[curClassId()];
+  const text='🏆 I reached GUARDIAN in Diablo 3 Season 39 (Shades of the Nephalem) playing '+c.name+'! Tracked with Season Forge — ashervox.github.io/season-forge/';
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>{document.getElementById('guardianCopyMsg').textContent='Copied! Paste it anywhere.'})}
+  else{document.getElementById('guardianCopyMsg').textContent=text}
 }
 function renderConquests(){
   const st=jnyLoad("conquests"),host=document.getElementById("jnyconquests");host.innerHTML="";let cd=0;
@@ -1134,9 +1200,11 @@ function calcGemOdds(){
   const attempts=Math.min(5,3+(noDeath?1:0)+(empowered?1:0));
   const cumulative=Math.round((1-Math.pow(1-p,attempts))*10000)/100;
   let color=pct>=60?'var(--setc)':(pct>=15?'var(--gold2)':'var(--red2)');
+  const grFor100=rank+10;
   document.getElementById('gemodds').innerHTML=`Rift ${gr} vs rank ${rank} gem (diff ${diff>=0?'+':''}${diff}) → <b style="color:${color}">${pct}%</b> chance per single upgrade attempt.<br>`+
    `<b style="color:var(--gold2)">${attempts} attempts</b> this Rift (3 base${noDeath?' +1 no-death':''}${empowered?' +1 empowered':''}, capped at 5) → `+
    `<b style="color:var(--setc)">~${cumulative}%</b> chance of at least one success across all ${attempts} attempts.<br>`+
+   `<b style="color:var(--gold2)">Want guaranteed (100%)?</b> Clear a Rift <b>${grFor100}</b> or higher for this rank-${rank} gem.<br>`+
    `Rule of thumb: push Rifts <b>10+ levels above</b> your gem's rank for guaranteed (100%) upgrades; right at your rank (or up to +6) = 60%.<br>`+
    `<span class="tdesc" style="font-size:11px">Note: the cumulative figure assumes odds stay constant across attempts. In reality each success bumps the gem's rank, which slightly lowers the odds on your next attempt within the same Rift.</span>`;
 }
@@ -1476,6 +1544,52 @@ function renderStartHere(){
   ];
   document.getElementById('startherebox').innerHTML='<div class="howbox">'+steps.map(s=>'<b style="color:var(--gold2)">'+s[0]+'</b><br>'+s[1]).join('<br><br>')+'</div>';
 }
+/* Session Planner — rule-based route, not a true optimizer. Reads real state (Journey progress,
+   gap-analysis missing items) and slots in generic time-boxed activities to fill the budget. */
+const SP_ACTIVITIES=[
+ ["Kadala gambling run (spend Blood Shards)",8],
+ ["One Nephalem Rift (bounty mats / leveling)",6],
+ ["One Act's Bounties",18],
+ ["One Greater Rift attempt (gem upgrades)",12],
+ ["Kanai's Cube: Upgrade Rare / Convert Set",5],
+ ["Farm one missing BiS piece",15],
+];
+function renderSpButtons(){
+  const host=document.getElementById('spTimeBtns');host.innerHTML='';
+  [15,30,45,60,90].forEach(min=>{const b=document.createElement('button');b.className='chip';b.textContent=min+' min';b.onclick=()=>renderSessionPlan(min);host.appendChild(b)});
+}
+function renderSessionPlan(minutes){
+  document.querySelectorAll('#spTimeBtns .chip').forEach(c=>c.classList.toggle('active',c.textContent===minutes+' min'));
+  const cId=curClassId(),bId=curBuildId(cId),b=CLASSES[cId].builds[bId];
+  const plan=[];let budget=minutes;
+  // 1. unfinished journey tier (highest priority, always first if time allows)
+  const jst=jnyLoad('journey');
+  let nextTier=null;
+  for(const [ti,t] of JOURNEY.entries()){
+    const undone=t.objs.map((o,oi)=>({o,oi})).filter(x=>!jst[ti+'-'+x.oi]);
+    if(undone.length){nextTier={tier:t.tier,obj:undone[0].o};break}
+  }
+  if(nextTier&&budget>=10){plan.push(['Journey: '+nextTier.tier,nextTier.obj,10]);budget-=10}
+  // 2. top missing gear item (from gap analysis state)
+  let gst;try{gst=JSON.parse(localStorage.getItem(gapOwnedKey(cId,bId)))||{}}catch(e){gst={}}
+  const missing=b.legendaries.filter((g,i)=>!gst[i]);
+  if(missing.length&&budget>=15){plan.push(['Farm gear',missing[0][0]+' — try Kadala + Cube "Upgrade Rare"',15]);budget-=15}
+  // 3. fill remaining budget with generic activities, largest-fit-first
+  const sorted=[...SP_ACTIVITIES].sort((a,b2)=>b2[1]-a[1]);
+  let guard=0;
+  while(budget>=5&&guard<10){
+    guard++;
+    const fit=sorted.find(a=>a[1]<=budget);
+    if(!fit)break;
+    plan.push([fit[0],'',fit[1]]);budget-=fit[1];
+  }
+  const used=minutes-budget;
+  document.getElementById('spOut').innerHTML=(plan.length?
+   '<div class="howbox">⚠ Rule-of-thumb route, not a true optimizer — built from your real Journey progress and gear gaps, filled out with typical activity lengths.</div>'+
+   plan.map((p,i)=>`<div class="task" style="cursor:default"><div class="chk" style="background:var(--gold);color:#1a1006;display:flex;align-items:center;justify-content:center;font-weight:800">${i+1}</div><div><div class="ttitle">${p[0]} <span class="slot">~${p[2]} min</span></div>${p[1]?'<div class="tdesc">'+p[1]+'</div>':''}</div></div>`).join('')+
+   '<div class="tdesc" style="margin-top:6px">~'+used+' of '+minutes+' minutes planned.</div>'
+   :'<div class="tdesc">Not enough time for a full activity — try a bigger window, or just do a quick Nephalem Rift.</div>');
+}
 function gapOwnedKey(cId,bId){return 'd3master_owned_'+cId+'_'+bId}
 function renderGap(){
   const cId=curClassId(),bId=curBuildId(cId),b=CLASSES[cId].builds[bId];
@@ -1488,6 +1602,24 @@ function renderGap(){
   const missing=b.legendaries.filter((_,i)=>!st[i]).map(g=>g[0]);
   let saved='';try{const gs=JSON.parse(localStorage.getItem('d3master_gapstats'))||{};const p=[];if(gs.cdr!=null)p.push(gs.cdr+'% CDR');if(gs.main!=null)p.push(gs.main+' main stat');if(p.length)saved=' · Your saved stats: '+p.join(' · ');}catch(e){}
   document.getElementById('gapout').innerHTML=`You own <b>${owned}/${tot}</b> key items (${Math.round(owned/tot*100)}%).${missing.length?'<br>Still missing: '+missing.join(', '):' — full BiS legendaries! 🎉'}${saved}`;
+  renderUpgradeRanker(b,st);
+}
+/* "Next Best Upgrade" — heuristic power-gain estimate per missing slot type.
+   Flagged as an estimate: no per-build DPS simulation exists in this dataset, so these are
+   generic rule-of-thumb weights (weapon/offhand carry a build's core multiplier; jewelry/cube
+   pieces are usually smaller, situational bonuses). Treat as "farm in this order," not exact %. */
+function renderUpgradeRanker(b,st){
+  const host=document.getElementById('gapranker');if(!host)return;
+  const missingIdx=b.legendaries.map((g,i)=>({g,i})).filter(x=>!st[x.i]);
+  if(!missingIdx.length){host.innerHTML='<div class="tdesc">🎉 Nothing left to rank — you have every key item.</div>';return}
+  const ranked=missingIdx.map(x=>{
+    const slot=(x.g[1]||'').toLowerCase();
+    const w=UPGRADE_WEIGHT[slot]||[10,18];
+    const pct=Math.round((w[0]+w[1])/2);
+    return {name:x.g[0],slot:x.g[1]||'',pct,w};
+  }).sort((a,b2)=>b2.pct-a.pct).slice(0,3);
+  host.innerHTML='<div class="howbox">⚠ Estimated, not simulated — no per-build DPS model exists here. Ranked by typical impact per slot type (weapon/offhand > jewelry > armor).</div>'+
+   ranked.map((r,i)=>`<div class="task" style="cursor:default"><div class="chk" style="background:var(--gold);color:#1a1006;display:flex;align-items:center;justify-content:center;font-weight:800">${i+1}</div><div><div class="ttitle">${r.name}${slotTxt(r.slot)}</div><div class="tdesc">~${r.w[0]}-${r.w[1]}% estimated power gain — farm this next.</div></div></div>`).join('');
 }
 function saveGapStats(){const cdr=document.getElementById('gapcdr').value,main=document.getElementById('gapmain').value;localStorage.setItem('d3master_gapstats',JSON.stringify({cdr:cdr===''?null:+cdr,main:main===''?null:+main}));renderGap()}
 
@@ -1675,6 +1807,23 @@ function renderLab(){
   const pv=document.getElementById('labpassives');pv.innerHTML='';
   for(let i=0;i<4;i++){const p=LAB.passives[i];const el=document.createElement('div');el.className='slot2';el.innerHTML='<div class="sl">Passive '+(i+1)+'</div><div class="it skl'+(p?'':' empty')+'">'+(p||'— empty —')+'</div>';el.onclick=()=>openModal('Passive',clearFirst(P.passives),v=>{LAB.passives[i]=v;labSave();renderLab()});pv.appendChild(el)}
   renderMatches(P);
+  renderSynergyWarnings();
+}
+/* Skill synergy warnings — heuristic, built from the skillRole() keyword tagger already used
+   elsewhere. Flagged: this checks broad role coverage, not verified per-skill elemental/rune
+   conflicts (that would need a full skill-element dataset this project doesn't have). */
+function renderSynergyWarnings(){
+  const host=document.getElementById('labwarnings');if(!host)return;
+  const filled=LAB.skills.filter(Boolean);
+  const warns=[];
+  if(filled.length===0){host.innerHTML='';return}
+  const roles=filled.map(s=>skillRole(s.skill+' '+(s.rune||'')));
+  if(!roles.includes('Damage'))warns.push('No clearly offensive skill selected — you may be missing your main damage source.');
+  if(!roles.includes('Survivability')&&!roles.includes('Mobility'))warns.push('No defensive or mobility skill selected — consider adding one for tougher content.');
+  if(filled.length<6&&filled.length>=3)warns.push(`Only ${filled.length}/6 skill slots filled — fill the rest for a complete loadout read.`);
+  const emptyGear=Object.values(LAB.gear).filter(Boolean).length;
+  if(emptyGear===0&&filled.length)warns.push('No gear equipped yet — synergy/matching will be more accurate once you add items.');
+  host.innerHTML=warns.length?('<div class="howbox" style="border-left-color:var(--red2)"><b>⚠ Synergy check</b> (heuristic, not a verified elemental/rune-conflict engine):<br>'+warns.map(w=>'• '+w).join('<br>')+'</div>'):'';
 }
 function clearFirst(arr){return [{label:'— clear —',value:null}].concat(arr.map(n=>({label:n,value:n})))}
 function pickGear(slot,label){const arr=itemsForSlot(LAB.cls,slot);const opts=[{label:'— clear —',value:null}].concat(arr.map(n=>({label:n,value:n,icon:iconFor(n),q:qualOf(n)})));openModal(label+' — '+arr.length+' options',opts,v=>{LAB.gear[slot]=v||undefined;labSave();renderLab()})}
@@ -1724,6 +1873,25 @@ function openSetAdvisor(){
 function clearLab(){LAB.gear={};LAB.gems=[null,null,null];LAB.cube={weapon:null,armor:null,jewelry:null};LAB.skills=[null,null,null,null,null,null];LAB.passives=[null,null,null,null];labSave();renderLab()}
 function copyLabCode(){const code=btoa(encodeURIComponent(JSON.stringify(LAB)));document.getElementById('labcode').value=code;if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(()=>{document.getElementById('labmsg').textContent='Copied!'}).catch(()=>{document.getElementById('labmsg').textContent='Select & copy the code above.'})}else{document.getElementById('labmsg').textContent='Select & copy the code above.'}}
 function loadLabCode(){try{const p=JSON.parse(decodeURIComponent(atob(document.getElementById('labcode').value.trim())));if(!p.cls||!CLASSES[p.cls])throw'bad';LAB=Object.assign(labDefault(),p);labSave();renderLab();document.getElementById('labmsg').textContent='Loaded!'}catch(e){document.getElementById('labmsg').textContent='Invalid build code.'}}
+function copyShareLink(){
+  const code=btoa(encodeURIComponent(JSON.stringify(LAB)));
+  const url=location.origin+location.pathname+'#build='+code;
+  document.getElementById('labcode').value=url;
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(()=>{document.getElementById('labmsg').textContent='Link copied! Paste it anywhere — opening it loads this exact build.'}).catch(()=>{document.getElementById('labmsg').textContent='Select & copy the link above.'})}
+  else{document.getElementById('labmsg').textContent='Select & copy the link above.'}
+}
+function loadBuildFromHash(){
+  const h=location.hash;
+  if(h.indexOf('#build=')!==0)return;
+  try{
+    const code=decodeURIComponent(h.slice(7));
+    const p=JSON.parse(decodeURIComponent(atob(code)));
+    if(!p.cls||!CLASSES[p.cls])throw'bad';
+    LAB=Object.assign(labDefault(),p);labSave();renderLab();
+    goToView('lab');
+    setTimeout(()=>{document.getElementById('labmsg').textContent='Loaded a shared build!'},200);
+  }catch(e){}
+}
 function initLab(){LAB=labLoad();if(!LAB||!LAB.cls||!CLASSES[LAB.cls])LAB=labDefault();renderLab()}
 
 /* ---- tab switching (top tabs + mobile bottom nav share one function) ---- */
@@ -1765,7 +1933,7 @@ function ding(){if(!SFX)return;try{_ac=_ac||new (window.AudioContext||window.web
 (function countdown(){const end=new Date(2026,8,27,17,0,0),now=new Date();const days=Math.max(0,Math.ceil((end-now)/86400000));document.getElementById('countdown').innerHTML=days>0?`Season 39 · <b>~${days} days</b> left (est.)`:'Season 39 has ended';})();
 
 /* ---- tools init ---- */
-renderCDRSources();renderCDRPresets();updateAugClass();calcShards();calcCDR();calcAug();calcGemOdds();renderGap();updateSfxBtn();initLab();loadItemDB();renderGlossary();populateCompareSelects();renderCompare();populateAzBuild();renderAnalyzer();
+renderCDRSources();renderCDRPresets();updateAugClass();calcShards();calcCDR();calcAug();calcGemOdds();renderGap();updateSfxBtn();initLab();loadItemDB();renderGlossary();populateCompareSelects();renderCompare();populateAzBuild();renderAnalyzer();renderSpButtons();checkGuardianCelebration();loadBuildFromHash();
 try{const gs=JSON.parse(localStorage.getItem('d3master_gapstats'))||{};if(gs.cdr!=null)document.getElementById('gapcdr').value=gs.cdr;if(gs.main!=null)document.getElementById('gapmain').value=gs.main;}catch(e){}
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}</script>

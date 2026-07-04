@@ -156,6 +156,11 @@
   .pgncat{margin-bottom:10px}
   .pgncat b{color:var(--gold2);font-size:13px}
   .pgncat span{display:block;font-size:12.5px;color:var(--txt);margin-top:2px;line-height:1.4}
+  .cmptable{width:100%;border-collapse:collapse;font-size:13px}
+  .cmptable td,.cmptable th{padding:6px 8px;border-bottom:1px dashed var(--line);vertical-align:top;text-align:left}
+  .cmptable th{color:var(--gold);font-size:11px;letter-spacing:1px;text-transform:uppercase}
+  .cmptable .shared{color:var(--setc)}
+  .cmprow-label{color:var(--muted);font-size:11px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
   @media(max-width:560px){
     header h1{font-size:21px;letter-spacing:1.5px}
     .tab{padding:9px 13px;font-size:12px}
@@ -245,6 +250,15 @@
     <div class="card full">
       <h2>Upgrade Checklist <button class="btn" onclick="resetGuide()" style="float:right">Reset</button></h2>
       <div id="gtasks"></div>
+    </div>
+    <div class="card full">
+      <h2>⚖ Compare Two Builds</h2>
+      <div class="pickers" style="margin-bottom:12px">
+        <div style="flex:1 1 260px"><label>Build A</label><select class="bigsel" id="cmpA" style="width:100%"></select></div>
+        <div style="flex:1 1 260px"><label>Build B</label><select class="bigsel" id="cmpB" style="width:100%"></select></div>
+      </div>
+      <button class="btn" onclick="renderCompare()" style="margin-bottom:12px">Compare</button>
+      <div id="compareOut"></div>
     </div>
   </div>
 </div>
@@ -914,6 +928,33 @@ const GLOSSARY=[
  ["Nephalem Rift","A randomized dungeon (non-Greater) used for gearing, bounties, and leveling — no time limit or gem upgrades."],
 ];
 function renderGlossary(){document.getElementById('glossary').innerHTML=GLOSSARY.map(g=>'<div><b style="color:var(--gold2)">'+g[0]+'</b><div class="tdesc">'+g[1]+'</div></div>').join('')}
+function populateCompareSelects(){
+  ['cmpA','cmpB'].forEach((id,idx)=>{
+    const sel=document.getElementById(id);sel.innerHTML='';
+    ORDER.forEach(cId=>{const grp=document.createElement('optgroup');grp.label=CLASSES[cId].name;
+      CLASSES[cId].order.forEach(bId=>{const o=document.createElement('option');o.value=cId+'/'+bId;o.textContent=CLASSES[cId].builds[bId].name;grp.appendChild(o)});
+      sel.appendChild(grp);});
+    if(idx===0)sel.selectedIndex=0; else sel.selectedIndex=Math.min(1,sel.options.length-1);
+  });
+}
+function cmpList(arr,other,pick){const o=new Set((other||[]).map(pick));return arr.map(x=>{const v=pick(x);return (o.has(v)?'<span class="shared">':'')+v+(o.has(v)?'</span>':'')})}
+function renderCompare(){
+  const [aC,aB]=document.getElementById('cmpA').value.split('/'),[bC,bB]=document.getElementById('cmpB').value.split('/');
+  const A=CLASSES[aC].builds[aB],B=CLASSES[bC].builds[bB];
+  const rows=[
+   ['Set',[A.set,B.set]],
+   ['Skills',[cmpList(A.skills,B.skills,s=>s[0]).join(', '),cmpList(B.skills,A.skills,s=>s[0]).join(', ')]],
+   ['Passives',[cmpList(A.passives,B.passives,x=>x).join(', '),cmpList(B.passives,A.passives,x=>x).join(', ')]],
+   ['Key Legendaries',[cmpList(A.legendaries,B.legendaries,g=>g[0]).join(', '),cmpList(B.legendaries,A.legendaries,g=>g[0]).join(', ')]],
+   ['Cube',[cmpList(A.cube,B.cube,g=>g[0]).join(', '),cmpList(B.cube,A.cube,g=>g[0]).join(', ')]],
+   ['Gems',[cmpList(A.gems,B.gems,x=>x).join(', '),cmpList(B.gems,A.gems,x=>x).join(', ')]],
+   ['Playstyle',[A.tag,B.tag]],
+  ];
+  document.getElementById('compareOut').innerHTML='<div class="tdesc" style="margin-bottom:8px">'+
+   '<span class="shared">Green</span> = shared between both builds.</div>'+
+   '<table class="cmptable"><tr><th></th><th>'+CLASSES[aC].name+' — '+A.name+'</th><th>'+CLASSES[bC].name+' — '+B.name+'</th></tr>'+
+   rows.map(r=>'<tr><td class="cmprow-label">'+r[0]+'</td><td>'+r[1][0]+'</td><td>'+r[1][1]+'</td></tr>').join('')+'</table>';
+}
 function renderStartHere(){
   const cId=curClassId(),c=CLASSES[cId];
   const freeId=c.order.find(id=>c.builds[id].free)||c.order[0];const fb=c.builds[freeId];
@@ -1193,7 +1234,7 @@ function ding(){if(!SFX)return;try{_ac=_ac||new (window.AudioContext||window.web
 (function countdown(){const end=new Date(2026,8,27,17,0,0),now=new Date();const days=Math.max(0,Math.ceil((end-now)/86400000));document.getElementById('countdown').innerHTML=days>0?`Season 39 · <b>~${days} days</b> left (est.)`:'Season 39 has ended';})();
 
 /* ---- tools init ---- */
-renderCDRSources();renderCDRPresets();updateAugClass();calcShards();calcCDR();calcAug();calcGemOdds();renderGap();updateSfxBtn();initLab();loadItemDB();renderGlossary();
+renderCDRSources();renderCDRPresets();updateAugClass();calcShards();calcCDR();calcAug();calcGemOdds();renderGap();updateSfxBtn();initLab();loadItemDB();renderGlossary();populateCompareSelects();renderCompare();
 try{const gs=JSON.parse(localStorage.getItem('d3master_gapstats'))||{};if(gs.cdr!=null)document.getElementById('gapcdr').value=gs.cdr;if(gs.main!=null)document.getElementById('gapmain').value=gs.main;}catch(e){}
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}</script>

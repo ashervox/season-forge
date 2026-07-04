@@ -110,6 +110,18 @@
   .pill{display:inline-block;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:middle}
   .pill.prio{background:rgba(176,48,31,.25);color:var(--red2);border:1px solid var(--red)}
   .pill.med{background:rgba(90,127,176,.2);color:var(--blue);border:1px solid var(--blue)}
+  .pill.trio{background:rgba(201,162,75,.22);color:var(--gold2);border:1px solid var(--gold)}
+  .rowlabel{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:4px 0 12px;display:flex;align-items:center;gap:6px}
+  .accordion{display:flex;flex-direction:column;gap:10px}
+  .acc-item{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .acc-head{width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--gold);font-size:15px;letter-spacing:1px;text-transform:uppercase;font-weight:700;padding:16px 18px;cursor:pointer;text-align:left;font-family:inherit}
+  .acc-head:hover{color:var(--gold2)}
+  .acc-head span:first-child{flex:1}
+  .acc-chevron{font-size:13px;color:var(--muted);transition:transform .2s}
+  .acc-item.open .acc-chevron{transform:rotate(180deg)}
+  .acc-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .acc-item.open .acc-body{max-height:1400px}
+  .acc-inner{padding:0 18px 18px}
   .pill.free{background:rgba(90,143,74,.22);color:#8fce7a;border:1px solid var(--green)}
   .full{grid-column:1/-1}
   .sub{color:var(--gold);font-weight:600;font-size:13px;margin:12px 0 6px;letter-spacing:.5px}.sub:first-child{margin-top:0}
@@ -134,6 +146,12 @@
   .info:hover,.info:focus{color:var(--gold);border-color:var(--gold);outline:none}
   .info::after{content:attr(data-tip);position:absolute;top:135%;left:50%;transform:translateX(-50%);width:250px;max-width:72vw;background:#12100c;border:1px solid var(--gold);color:var(--txt);font-size:12px;font-weight:400;line-height:1.5;letter-spacing:0;text-transform:none;padding:9px 11px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.55);opacity:0;visibility:hidden;transition:opacity .15s;z-index:30;text-align:left;pointer-events:none}
   .info:hover::after,.info:focus::after{opacity:1;visibility:visible}
+  .icotoolbar{display:flex;gap:6px;margin-left:auto}
+  .icobtn{position:relative;width:36px;height:36px;border-radius:8px;background:var(--panel);border:1px solid var(--line);color:var(--txt);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+  .icobtn:hover{border-color:var(--gold);color:var(--gold)}
+  .icobtn::after{content:attr(data-tip);position:absolute;bottom:130%;left:50%;transform:translateX(-50%);width:180px;background:#12100c;border:1px solid var(--gold);color:var(--txt);font-size:11.5px;font-weight:400;line-height:1.4;padding:7px 9px;border-radius:7px;box-shadow:0 8px 20px rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:opacity .15s;z-index:30;text-align:center;pointer-events:none}
+  .icobtn:hover::after,.icobtn:focus::after{opacity:1;visibility:visible}
+  @media(max-width:560px){.labbtns{flex-direction:column;align-items:stretch!important}.icotoolbar{margin-left:0;justify-content:center}}
   /* ===== Build Lab ===== */
   .labtop{display:flex;gap:18px;flex-wrap:wrap;align-items:stretch}
   .labportrait{flex:1 1 300px;min-width:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,var(--tint),var(--panel));border:1px solid var(--line);border-radius:12px;padding:16px}
@@ -230,7 +248,7 @@
 
 <div class="welcome" id="welcome">
   <div class="welcomebox">
-    <h2>⚔ Welcome, Nephalem</h2>
+    <h2>Welcome, Nephalem</h2>
     <p>This is a free, offline-friendly guide for <b>all 7 Diablo 3 classes</b> — Season 39. No login, no ads. Everything you check off saves right on this device.</p>
     <div class="steps">
       <b>1.</b> Pick a class & a beginner-friendly build (⭐ = your free Haedrig's set)<br>
@@ -260,13 +278,13 @@
 <!-- ===== BUILD GUIDE ===== -->
 <div class="view active" id="guide">
   <div class="card full" style="margin-bottom:14px">
-    <h2>🆕 New season? Start Here</h2>
+    <h2>New Season? Start Here</h2>
     <div class="tdesc" style="margin-bottom:8px">Get a literal step-by-step funnel for your <b>currently selected class</b>: beginner build → Haedrig's plan → leveling route → first GR target.</div>
     <button class="bigcta" style="padding:10px 22px;font-size:13.5px" onclick="renderStartHere()">🚀 Show my start-here plan</button>
     <div id="startherebox" style="margin-top:10px"></div>
   </div>
   <div class="card full" style="margin-bottom:14px">
-    <h2>⏱ Session Planner <span class="info" tabindex="0" data-tip="A rule-of-thumb route for your play session — not a perfect optimizer, just a sensible order based on your Journey progress, gear gaps, and how much time you've got.">?</span></h2>
+    <h2>Session Planner <span class="info" tabindex="0" data-tip="A rule-of-thumb route for your play session — not a perfect optimizer, just a sensible order based on your Journey progress, gear gaps, and how much time you've got.">?</span></h2>
     <div class="tdesc" style="margin-bottom:8px">Tell me how long you've got, get a suggested route for this session.</div>
     <div class="chiprow" id="spTimeBtns" style="margin-bottom:10px"></div>
     <div id="spOut"></div>
@@ -276,13 +294,13 @@
     <div style="flex:1 1 260px"><label><span style="color:var(--gold2)">② </span>Goal Build <span class="slot">(★ = free set)</span></label><div class="chiprow" id="buildbtns"></div></div>
     <div style="flex:1 1 260px"><label><span style="color:var(--gold2)">③ </span>Tier <span class="info" tabindex="0" data-tip="Same build, different stage of gearing. Toggle to see what changes about gear priority and paragon focus at each stage. Skills/legendaries listed below stay the endgame target throughout — these are generic staging principles, not per-tier item swaps.">?</span></label><div class="chiprow" id="tierbtns"></div></div>
   </div>
-  <div class="progwrap">
+  <div class="progwrap" id="gprogwrap" style="display:none">
     <div class="progbar"><div class="progfill" id="gprog"></div></div>
-    <div class="progtxt" id="gprogtxt">0 / 0 upgrade steps complete</div>
+    <div class="progtxt" id="gprogtxt"></div>
   </div>
   <div class="grid">
     <div class="card">
-      <h2>The Plan</h2>
+      <h2>Overview <span class="info" tabindex="0" data-tip="Your current class + build selection at a glance. Full skills, passives, and gear are below in Endgame Target.">?</span></h2>
       <div class="stat-row"><span>Class</span><span id="pClass"></span></div>
       <div class="stat-row"><span>Season</span><span>39 · Shades of the Nephalem</span></div>
       <div class="stat-row"><span>Free Set (Haedrig's)</span><span id="pFree"></span></div>
@@ -297,10 +315,9 @@
     <div class="card full">
       <h2>Paragon Priority <span class="slot" id="pgnTip"></span></h2>
       <div class="grid" style="gap:14px" id="pgnGrid"></div>
-      <div class="tdesc" style="font-size:12px;margin-top:10px;color:var(--muted)">Caps: Movement Speed 25% total (gear + paragon) · Paragon Cooldown Reduction 10% · Attack Speed / Crit Chance / Crit Damage / Resource Cost Reduction each cap at 50 points.</div>
     </div>
     <div class="card full">
-      <h2>📈 GR Pushing Reference <span class="info" tabindex="0" data-tip="General toughness/DPS breakpoint principles and Rift Guardian enrage guidance. These are generic rules of thumb, not per-build verified numbers — treat as a starting framework, not exact targets.">?</span></h2>
+      <h2>GR Pushing Reference <span class="info" tabindex="0" data-tip="General toughness/DPS breakpoint principles and Rift Guardian enrage guidance. These are generic rules of thumb, not per-build verified numbers — treat as a starting framework, not exact targets.">?</span></h2>
       <div class="howbox">⚠ Generic guidance, not per-build verified breakpoints (that data isn't available in this dataset). Use as a framework, confirm against your own clears.</div>
       <div class="grid" style="gap:14px">
         <div class="pgncat"><b>Toughness check</b><span>You should be able to face-tank 2-3 hits from same-tier trash without dying. If one white-mob hit kills you, you're pushing too high on toughness relative to your DPS — gear more Life%/Armor/Resist before adding more offense.</span></div>
@@ -310,7 +327,7 @@
       </div>
     </div>
     <div class="card full">
-      <h2>🎯 Endgame Target — <span id="pBuildName" style="text-transform:none;letter-spacing:0;color:var(--gold2)"></span></h2>
+      <h2>Endgame Target — <span id="pBuildName" style="text-transform:none;letter-spacing:0;color:var(--gold2)"></span></h2>
       <div class="setline">Uses <b id="gsetline"></b> · <span id="gtagline"></span></div>
       <div class="howbox" id="ghow"></div>
       <div class="grid" style="gap:14px">
@@ -328,7 +345,7 @@
       </div>
     </div>
     <div class="card full">
-      <h2>🌑 Shadow Clone <span class="info" tabindex="0" data-tip="Season 39's theme: activating a Shrine or Pylon spawns a shadow clone of your class for 60 seconds, scaled to your power. It randomly uses 1 of 3 fixed 6-skill loadouts (no passives, no gear/set bonuses) — only the base skill + rune matters.">?</span></h2>
+      <h2>Shadow Clone <span class="info" tabindex="0" data-tip="Season 39's theme: activating a Shrine or Pylon spawns a shadow clone of your class for 60 seconds, scaled to your power. It randomly uses 1 of 3 fixed 6-skill loadouts (no passives, no gear/set bonuses) — only the base skill + rune matters.">?</span></h2>
       <div class="tdesc" id="shadowIntro" style="margin-bottom:10px"></div>
       <div class="grid" style="gap:12px" id="shadowClones"></div>
     </div>
@@ -337,7 +354,7 @@
       <div id="gtasks"></div>
     </div>
     <div class="card full">
-      <h2>⚖ Compare Two Builds</h2>
+      <h2>Compare Two Builds</h2>
       <div class="pickers" style="margin-bottom:12px">
         <div style="flex:1 1 260px"><label>Build A</label><select class="bigsel" id="cmpA" style="width:100%"></select></div>
         <div style="flex:1 1 260px"><label>Build B</label><select class="bigsel" id="cmpB" style="width:100%"></select></div>
@@ -363,14 +380,16 @@
       <div class="gendertoggle" id="labgender"></div>
     </div>
     <div class="labanalysis card">
-      <h2>⚗ Build Analysis <span class="info" tabindex="0" data-tip="As you equip items, this compares your loadout to all Season 39 meta builds and shows the closest matches — and which items you're missing to complete the top one.">?</span></h2>
+      <h2>Build Analysis <span class="info" tabindex="0" data-tip="As you equip items, this compares your loadout to all Season 39 meta builds and shows the closest matches — and which items you're missing to complete the top one.">?</span></h2>
       <div id="labmatch"></div>
-      <div class="labbtns" style="margin-top:12px">
-        <button class="btn" onclick="openSetAdvisor()">🛡 I have a set — what pairs?</button>
-        <button class="btn" onclick="openLoadMeta()">⬇ Load a meta build</button>
-        <button class="btn" onclick="clearLab()">✕ Clear</button>
-        <button class="btn" onclick="copyLabCode()">🔗 Copy build code</button>
-        <button class="bigcta" style="padding:8px 16px;font-size:12.5px" onclick="copyShareLink()">🌐 Copy shareable link</button>
+      <div class="labbtns" style="margin-top:12px;align-items:center">
+        <button class="bigcta" style="padding:9px 18px;font-size:12.5px" onclick="openSetAdvisor()">I have a set — what pairs?</button>
+        <div class="icotoolbar">
+          <button class="icobtn" data-tip="Load a meta build as a starting point" onclick="openLoadMeta()">⬇</button>
+          <button class="icobtn" data-tip="Copy build code (paste into Load code below)" onclick="copyLabCode()">🔗</button>
+          <button class="icobtn" data-tip="Copy a shareable link — opening it loads this build" onclick="copyShareLink()">🌐</button>
+          <button class="icobtn" data-tip="Clear this loadout" onclick="clearLab()">✕</button>
+        </div>
       </div>
       <textarea id="labcode" placeholder="Paste a build code, then click Load code…" style="width:100%;min-height:52px;background:#120c08;border:1px solid var(--line);color:var(--gold2);border-radius:6px;padding:8px;font-size:11px"></textarea>
       <div style="margin-top:6px"><button class="btn" onclick="loadLabCode()">Load code</button> <span id="labmsg" class="slot"></span></div>
@@ -394,117 +413,132 @@
 
 <!-- ===== SEASON JOURNEY ===== -->
 <div class="view" id="journey">
-  <div class="progwrap">
+  <div class="progwrap" id="jnyprogwrap" style="display:none">
     <div class="progbar"><div class="progfill" id="jnyprog"></div></div>
-    <div class="progtxt" id="jnyprogtxt">0 / 0 journey objectives complete</div>
+    <div class="progtxt" id="jnyprogtxt"></div>
   </div>
-  <div class="howbox">
-    <b>Season 39 Journey.</b> Work down the tiers — <b>Chapters II–IV</b> grant your free Haedrig's set, then
-    <b>Slayer → Champion → Destroyer → Conqueror → Guardian</b>. Reaching <b style="color:var(--gold2)">Conqueror earns the extra stash tab</b>,
-    and Guardian grants the exclusive seasonal cosmetics. Progress saves on this device.
-  </div>
+  <div class="rowlabel">Season 39 Journey <span class="info" tabindex="0" data-tip="Work down the tiers — Chapters II–IV grant your free Haedrig's set, then Slayer → Champion → Destroyer → Conqueror → Guardian. Conqueror earns the extra stash tab; Guardian grants exclusive seasonal cosmetics. Progress saves on this device.">?</span></div>
   <div class="grid" id="jnytiers"></div>
   <div class="card full" style="margin-top:18px">
-    <h2>Conquests <span id="jnycqcount" style="margin-left:auto;font-size:12px;letter-spacing:1px"></span></h2>
-    <div class="howbox">Conqueror needs <b>2</b> conquests · Guardian needs <b>3</b>. The <span class="pill med">Easy</span>-tagged ones are friendliest for a fresh hero — a common trio is <b>On a Good Day</b> + <b>Sprinter</b> + <b>Speed Demon</b>. (HC = Hardcore name.)</div>
-    <div style="margin-bottom:10px"><button class="btn" onclick="recommendConquests()">🎯 Recommend my easiest 2 (for my selected class/build)</button></div>
+    <h2>Conquests <span class="info" tabindex="0" data-tip="Conqueror needs 2 conquests, Guardian needs 3. HC = Hardcore name. Easy-tagged ones are friendliest for a fresh hero.">?</span> <span id="jnycqcount" style="margin-left:auto;font-size:12px;letter-spacing:1px"></span></h2>
+    <div style="margin-bottom:10px"><button class="btn" onclick="recommendConquests()">Recommend my easiest 2</button></div>
     <div id="cqrecommend"></div>
     <div id="jnyconquests"></div>
   </div>
   <div class="card full" style="margin-top:18px">
-    <h2>Set Dungeon Tracker <span id="sdcount" style="margin-left:auto;font-size:12px;letter-spacing:1px"></span></h2>
-    <div class="howbox">⚠ Built from the set names already in this site's build data (verified), but the exact dungeon location/objectives per set are NOT independently confirmed here — double check in-game. <b>Masters of the Universe</b> needs <b>8 total Set Dungeon Masteries</b> — these can come from any class you have, not just one, so the list below spans all 7 classes.</div>
+    <h2>Set Dungeon Tracker <span class="info" tabindex="0" data-tip="Built from set names in this site's build data — exact dungeon objectives aren't independently confirmed, double check in-game. Masters of the Universe needs 8 total masteries from any class, so this list spans all 7.">?</span> <span id="sdcount" style="margin-left:auto;font-size:12px;letter-spacing:1px"></span></h2>
     <div id="setdungeons"></div>
   </div>
 </div>
 
 <!-- ===== TOOLS ===== -->
 <div class="view" id="tools">
-  <div class="grid">
-    <div class="card full">
-      <h2>Kadala Blood Shard Calculator <span class="info" tabindex="0" data-tip="Estimates how many Kadala gambles your Blood Shards buy and roughly how many legendaries to expect. Cheaper slots = more gambles per shard.">?</span></h2>
-      <div class="calc">
-        <div><label>Blood shards available</label><input type="number" id="shards" value="500" min="0" oninput="calcShards()"></div>
-        <div><label>Gamble slot</label><select id="slot" onchange="calcShards()">
-          <option value="25">Shoulders / Gloves / Boots / Belt / Bracers (25)</option>
-          <option value="50">Legs / Rings (50)</option>
-          <option value="75">Chest / Weapons (75)</option>
-          <option value="100">Amulets (100)</option>
-        </select></div>
-      </div>
-      <div class="calcout" id="shardout"></div>
+  <div class="accordion" id="toolsAccordion">
+
+    <div class="acc-item">
+      <button class="acc-head" onclick="toggleAcc(this)"><span>Kadala Blood Shard Calculator</span> <span class="info" tabindex="0" data-tip="Estimates how many Kadala gambles your Blood Shards buy and roughly how many legendaries to expect. Cheaper slots = more gambles per shard.">?</span><span class="acc-chevron">▾</span></button>
+      <div class="acc-body"><div class="acc-inner">
+        <div class="calc">
+          <div><label>Blood shards available</label><input type="number" id="shards" value="500" min="0" oninput="calcShards()"></div>
+          <div><label>Gamble slot</label><select id="slot" onchange="calcShards()">
+            <option value="25">Shoulders / Gloves / Boots / Belt / Bracers (25)</option>
+            <option value="50">Legs / Rings (50)</option>
+            <option value="75">Chest / Weapons (75)</option>
+            <option value="100">Amulets (100)</option>
+          </select></div>
+        </div>
+        <div class="calcout" id="shardout"></div>
+      </div></div>
     </div>
-    <div class="card">
-      <h2>Cooldown Reduction Calculator <span class="info" tabindex="0" data-tip="CDR sources stack multiplicatively, not additively. Tick your sources to see your true total CDR% and how short a skill's cooldown becomes.">?</span></h2>
-      <div id="cdrsources"></div>
-      <div class="calc" style="margin-top:10px">
-        <div><label>Paragon CDR % (0–10)</label><input type="number" id="cdrpara" value="0" min="0" max="10" step="0.2" oninput="calcCDR()"></div>
-        <div><label>Other / custom %</label><input type="number" id="cdrcustom" value="0" min="0" max="80" oninput="calcCDR()"></div>
-        <div><label>Base cooldown (sec)</label><input type="number" id="cdrbase" value="120" min="0" oninput="calcCDR()"></div>
-      </div>
-      <div id="cdrpresets" style="margin-top:8px;font-size:12px;color:var(--muted)"></div>
-      <div class="calcout" id="cdrout"></div>
+
+    <div class="acc-item">
+      <button class="acc-head" onclick="toggleAcc(this)"><span>Cooldown Reduction Calculator</span> <span class="info" tabindex="0" data-tip="CDR sources stack multiplicatively, not additively. Tick your sources to see your true total CDR% and how short a skill's cooldown becomes.">?</span><span class="acc-chevron">▾</span></button>
+      <div class="acc-body"><div class="acc-inner">
+        <div id="cdrsources"></div>
+        <div class="calc" style="margin-top:10px">
+          <div><label>Paragon CDR % (0–10)</label><input type="number" id="cdrpara" value="0" min="0" max="10" step="0.2" oninput="calcCDR()"></div>
+          <div><label>Other / custom %</label><input type="number" id="cdrcustom" value="0" min="0" max="80" oninput="calcCDR()"></div>
+          <div><label>Base cooldown (sec)</label><input type="number" id="cdrbase" value="120" min="0" oninput="calcCDR()"></div>
+        </div>
+        <div id="cdrpresets" style="margin-top:8px;font-size:12px;color:var(--muted)"></div>
+        <div class="calcout" id="cdrout"></div>
+      </div></div>
     </div>
-    <div class="card">
-      <h2>Augment Calculator <span class="info" tabindex="0" data-tip="Caldesann's Despair: augmenting an Ancient/Primal item gives main stat = gem rank × 5. Shows the bonus and the mats needed (3 Flawless Royal gems + a leveled Legendary Gem).">?</span> <span class="slot" id="augclass"></span></h2>
-      <div class="calc">
-        <div><label>Legendary gem rank</label><input type="number" id="augrank" value="100" min="1" oninput="calcAug()"></div>
-        <button class="btn" onclick="calcAug()">Calculate</button>
-      </div>
-      <div class="calcout" id="augout"></div>
+
+    <div class="acc-item">
+      <button class="acc-head" onclick="toggleAcc(this)"><span>Augment Calculator <span class="slot" id="augclass"></span></span> <span class="info" tabindex="0" data-tip="Caldesann's Despair: augmenting an Ancient/Primal item gives main stat = gem rank × 5. Shows the bonus and the mats needed (3 Flawless Royal gems + a leveled Legendary Gem).">?</span><span class="acc-chevron">▾</span></button>
+      <div class="acc-body"><div class="acc-inner">
+        <div class="calc">
+          <div><label>Legendary gem rank</label><input type="number" id="augrank" value="100" min="1" oninput="calcAug()"></div>
+          <button class="btn" onclick="calcAug()">Calculate</button>
+        </div>
+        <div class="calcout" id="augout"></div>
+      </div></div>
     </div>
-    <div class="card">
-      <h2>Gem Upgrade Odds (Urshi) <span class="info" tabindex="0" data-tip="After a Greater Rift, Urshi can upgrade a Legendary Gem. Odds depend on the Rift level vs your gem's current rank — higher Rift level relative to your gem = better odds, up to 100%.">?</span></h2>
-      <div class="calc">
-        <div><label>Your gem's current rank</label><input type="number" id="gemrank" value="50" min="0" oninput="calcGemOdds()"></div>
-        <div><label>Greater Rift level cleared</label><input type="number" id="gemgr" value="55" min="1" oninput="calcGemOdds()"></div>
-      </div>
-      <div style="margin-top:8px"><label class="cdropt"><input type="checkbox" id="gemnodeath" onchange="calcGemOdds()"> No deaths this Rift (+1 attempt)</label><label class="cdropt"><input type="checkbox" id="gemempowered" onchange="calcGemOdds()"> Empowered Rift (gold-paid, +1 attempt)</label></div>
-      <div class="calcout" id="gemodds"></div>
-      <div class="tdesc" style="font-size:11.5px;margin-top:8px">Community-documented odds table, not official Blizzard numbers. Each upgrade attempt (up to 5 per Rift w/ no-death + gold-empowered bonuses) recalculates — a gem can go 100%→60%→30% across attempts as its rank climbs mid-run.</div>
+
+    <div class="acc-item">
+      <button class="acc-head" onclick="toggleAcc(this)"><span>Gem Upgrade Odds (Urshi)</span> <span class="info" tabindex="0" data-tip="After a Greater Rift, Urshi can upgrade a Legendary Gem. Odds depend on the Rift level vs your gem's current rank. Community-documented table, not official Blizzard numbers.">?</span><span class="acc-chevron">▾</span></button>
+      <div class="acc-body"><div class="acc-inner">
+        <div class="calc">
+          <div><label>Your gem's current rank</label><input type="number" id="gemrank" value="50" min="0" oninput="calcGemOdds()"></div>
+          <div><label>Greater Rift level cleared</label><input type="number" id="gemgr" value="55" min="1" oninput="calcGemOdds()"></div>
+        </div>
+        <div style="margin-top:8px"><label class="cdropt"><input type="checkbox" id="gemnodeath" onchange="calcGemOdds()"> No deaths this Rift (+1 attempt)</label><label class="cdropt"><input type="checkbox" id="gemempowered" onchange="calcGemOdds()"> Empowered Rift (gold-paid, +1 attempt)</label></div>
+        <div class="calcout" id="gemodds"></div>
+      </div></div>
     </div>
-    <div class="card full">
-      <h2>Character Check — Gap Analysis <span class="info" tabindex="0" data-tip="Tick the best-in-slot items you already own for your selected build to see your completion % and exactly which pieces are left to farm.">?</span> <span class="slot" id="gapbuild"></span></h2>
-      <div class="howbox">Tick the BiS items you own for your <b>selected class & build</b> (set them on the Build Guide tab). <i>True one-click Blizzard armory import can't run from a local file — the API needs an OAuth token and blocks browser access — so this is the offline equivalent.</i></div>
-      <div class="calc" style="margin-bottom:10px">
-        <div><label>Your current CDR %</label><input type="number" id="gapcdr" min="0" max="80"></div>
-        <div><label>Your main stat</label><input type="number" id="gapmain" min="0"></div>
-        <button class="btn" onclick="saveGapStats()">Save stats</button>
-      </div>
-      <div id="gapitems"></div>
-      <div class="calcout" id="gapout"></div>
+
+    <div class="acc-item">
+      <button class="acc-head" onclick="toggleAcc(this)"><span>Character Check — Gap Analysis <span class="slot" id="gapbuild"></span></span> <span class="info" tabindex="0" data-tip="Tick the best-in-slot items you already own for your selected class & build (set on the Build Guide tab) to see your completion % and what's left to farm. For an automatic version, use Sync My Character in the Gear Check tab instead.">?</span><span class="acc-chevron">▾</span></button>
+      <div class="acc-body"><div class="acc-inner">
+        <div class="calc" style="margin-bottom:10px">
+          <div><label>Your current CDR %</label><input type="number" id="gapcdr" min="0" max="80"></div>
+          <div><label>Your main stat</label><input type="number" id="gapmain" min="0"></div>
+          <button class="btn" onclick="saveGapStats()">Save stats</button>
+        </div>
+        <div id="gapitems"></div>
+        <div class="calcout" id="gapout"></div>
+      </div></div>
     </div>
-    <div class="card full">
-      <h2>🎯 Next Best Upgrade <span class="info" tabindex="0" data-tip="Ranks your top 3 missing items by typical impact — weapon/off-hand slots carry a build's core damage multiplier, jewelry is usually a smaller boost, armor slots smaller still. This is a heuristic estimate, not a simulated DPS calculation.">?</span></h2>
-      <div id="gapranker"></div>
+
+    <div class="acc-item">
+      <button class="acc-head" onclick="toggleAcc(this)"><span>Next Best Upgrade</span> <span class="info" tabindex="0" data-tip="Ranks your top 3 missing items by typical impact — weapon/off-hand slots carry a build's core damage multiplier, jewelry is usually a smaller boost, armor slots smaller still. This is a heuristic estimate, not a simulated DPS calculation.">?</span><span class="acc-chevron">▾</span></button>
+      <div class="acc-body"><div class="acc-inner">
+        <div id="gapranker"></div>
+      </div></div>
     </div>
-    <div class="card full">
-      <h2>Export / Import Progress <span class="info" tabindex="0" data-tip="Saves all your progress (build checklists + Season Journey) into a code you can move to another device. Paste a friend's code and hit Compare to see your Journeys side by side without overwriting yours.">?</span></h2>
-      <div class="howbox">Copy your <b>progress code</b> to move between PCs — or paste someone else's code and hit <b>Compare</b> to see Journey progress side by side. <b>Compare</b> never changes your data; <b>Load</b> replaces it.</div>
-      <div style="margin-bottom:8px"><button class="btn" onclick="exportCode()">Copy my progress code</button> <span id="expmsg" class="slot"></span></div>
-      <textarea id="impcode" placeholder="Paste a progress code here…" style="width:100%;min-height:64px;background:#120c08;border:1px solid var(--line);color:var(--gold2);border-radius:6px;padding:9px;font-size:12px"></textarea>
-      <div style="margin-top:8px"><button class="btn" onclick="compareCode()">Compare</button> <button class="btn" onclick="importCode()">Load (replace mine)</button></div>
-      <div class="calcout" id="impout"></div>
+
+    <div class="acc-item">
+      <button class="acc-head" onclick="toggleAcc(this)"><span>Export / Import Progress</span> <span class="info" tabindex="0" data-tip="Saves all your progress (build checklists + Season Journey) into a code you can move to another device. Paste a friend's code and hit Compare to see your Journeys side by side — Compare never changes your data, Load replaces it.">?</span><span class="acc-chevron">▾</span></button>
+      <div class="acc-body"><div class="acc-inner">
+        <div style="margin-bottom:8px"><button class="btn" onclick="exportCode()">Copy my progress code</button> <span id="expmsg" class="slot"></span></div>
+        <textarea id="impcode" placeholder="Paste a progress code here…" style="width:100%;min-height:64px;background:#120c08;border:1px solid var(--line);color:var(--gold2);border-radius:6px;padding:9px;font-size:12px"></textarea>
+        <div style="margin-top:8px"><button class="btn" onclick="compareCode()">Compare</button> <button class="btn" onclick="importCode()">Load (replace mine)</button></div>
+        <div class="calcout" id="impout"></div>
+      </div></div>
     </div>
-    <div class="card full">
-      <h2>Season 39 Haedrig's Gift Path <span class="info" tabindex="0" data-tip="Your free class set: finish Season Journey Chapters 2, 3 and 4 (Chapter 4 needs a solo Greater Rift 20) to receive all 6 set pieces in three gift bags.">?</span></h2>
-      <div class="tdesc" style="font-size:13.5px;line-height:1.7">
-        Completing Season Journey <b>Chapters 2, 3 and 4</b> grants your class's full free 6-piece set in three gift bags
-        (Chapter 4 requires a solo <b>GR20</b>). Make sure your <b>seasonal</b> hero completes the chapters. Builds that use a
-        different set use the free set as a bridge, then farm their set via Kadala + Kanai's Cube "Upgrade Rare".
-      </div>
+
+    <div class="acc-item">
+      <button class="acc-head" onclick="toggleAcc(this)"><span>Season 39 Haedrig's Gift Path</span> <span class="info" tabindex="0" data-tip="Finish Season Journey Chapters 2, 3 and 4 (Chapter 4 needs a solo GR20) to get your class's full free 6-piece set in three gift bags. Your seasonal hero must complete the chapters. Builds using a different set farm it via Kadala + Cube 'Upgrade Rare' after using the free set as a bridge.">?</span><span class="acc-chevron">▾</span></button>
+      <div class="acc-body"><div class="acc-inner">
+        <div class="tdesc">See the tooltip above for the full path — the short version: complete Chapters 2-4 in the Journey tab.</div>
+      </div></div>
     </div>
-    <div class="card full">
-      <h2>📖 Glossary</h2>
-      <div class="grid" style="gap:8px 24px" id="glossary"></div>
+
+    <div class="acc-item" id="glossaryAccItem">
+      <button class="acc-head" onclick="toggleAcc(this)"><span>Glossary</span><span class="acc-chevron">▾</span></button>
+      <div class="acc-body"><div class="acc-inner">
+        <div class="grid" style="gap:8px 24px" id="glossary"></div>
+      </div></div>
     </div>
+
   </div>
 </div>
 
 <!-- ===== GEAR ANALYZER ===== -->
 <div class="view" id="analyzer">
   <div class="card full" style="margin-bottom:14px">
-    <h2>🔍 Gear Check — Compare Your Real Gear to a Build</h2>
+    <h2>Gear Check — Compare Your Real Gear to a Build</h2>
     <div class="tdesc" style="margin-bottom:10px">Enter what you actually have equipped, slot by slot, and see exactly what's Good, needs improvement, or is the wrong item for your chosen build. Nothing here is uploaded — it's saved only in this browser.</div>
     <div class="pickers" style="margin-bottom:6px">
       <div style="flex:1 1 260px"><label>Compare against build</label><select class="bigsel" id="azBuild" style="width:100%" onchange="onAzBuildChange()"></select></div>
@@ -512,8 +546,8 @@
     <button class="btn" onclick="clearAnalyzer()">✕ Clear my entries</button>
   </div>
   <div class="card full" style="margin-bottom:14px">
-    <h2>🔄 Sync My Character <span class="info" tabindex="0" data-tip="Pulls your real seasonal character's equipped gear from the Battle.net D3 Community API via a small proxy, then auto-fills the gear rows below. Your Battle.net profile must have public progress sharing enabled.">?</span></h2>
-    <div class="howbox">Your Battle.net profile must have <b>public profile/progress sharing</b> enabled (Battle.net account → Settings → D3 → Sharing) or this will come back empty. This reflects your <b>last in-game save</b>, not real-time state.</div>
+    <h2>Sync My Character <span class="info" tabindex="0" data-tip="Pulls your real seasonal character's equipped gear from the Battle.net D3 Community API via a small proxy, then auto-fills the gear rows below. Your Battle.net profile must have public progress sharing enabled.">?</span></h2>
+    <div class="howbox">Needs <b>public profile sharing</b> enabled (Battle.net → Account Settings → D3 → Sharing). Shows your last in-game save, not real-time state.</div>
     <div class="pickers" style="margin-bottom:8px">
       <div style="flex:1 1 200px"><label>BattleTag</label><input id="syncTag" placeholder="Ashervox#1234" style="width:100%;background:#120c08;border:1px solid var(--line);color:var(--gold2);padding:8px;border-radius:6px"></div>
       <div style="flex:0 1 120px"><label>Region</label><select id="syncRegion" class="bigsel" style="width:100%"><option value="us">Americas</option><option value="eu">Europe</option><option value="kr">Asia</option><option value="tw">Taiwan/HK</option></select></div>
@@ -524,7 +558,7 @@
     <div id="syncLastUpdated" class="tdesc" style="margin-top:8px"></div>
   </div>
   <div class="card full" style="margin-bottom:14px">
-    <h2>🎯 Fix This First <span class="info" tabindex="0" data-tip="Ranked by impact: a missing build-defining item outweighs a missing Ancient rarity flag, which outweighs a minor stat gap.">?</span></h2>
+    <h2>Fix This First <span class="info" tabindex="0" data-tip="Ranked by impact: a missing build-defining item outweighs a missing Ancient rarity flag, which outweighs a minor stat gap.">?</span></h2>
     <div id="azFixFirst"></div>
   </div>
   <div class="card full">
@@ -549,12 +583,12 @@
     <div class="grid" style="gap:10px" id="launchGlance"></div>
   </div>
   <div class="card full" style="margin-bottom:14px">
-    <h2>🏆 Build Tier List <span class="info" tabindex="0" data-tip="Editable as the meta settles — use the ▲▼ arrows to reorder within a class. This is a starting seed, not a final verdict; treat it as a living document.">?</span></h2>
+    <h2>Build Tier List <span class="info" tabindex="0" data-tip="Editable as the meta settles — use the ▲▼ arrows to reorder within a class. This is a starting seed, not a final verdict; treat it as a living document.">?</span></h2>
     <div class="tdesc" style="margin-bottom:10px">⚠ Seeded automatically (free-set builds ranked A, others B) — reorder/re-tier as real meta data comes in during the first week.</div>
     <div id="launchTierList"></div>
   </div>
   <div class="card full" style="margin-bottom:14px">
-    <h2>➕ Add Update</h2>
+    <h2>Add Update</h2>
     <div class="tdesc" style="margin-bottom:10px">Fast entry form for launch day — no code editing. Saved right in this browser.</div>
     <div class="grid" style="gap:10px">
       <div><label style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)">Title</label><input id="leTitle" placeholder="e.g. Hotfix: Necromancer bug" style="width:100%;background:#120c08;border:1px solid var(--line);color:var(--gold2);padding:8px;border-radius:6px"></div>
@@ -566,7 +600,7 @@
     <button class="bigcta" style="padding:9px 20px;font-size:13px;margin-top:12px" onclick="addLaunchEntry()">📌 Post Update</button>
   </div>
   <div class="card full">
-    <h2>🔴 Live Updates <button class="btn" style="float:right" onclick="resetLaunchFeed()">Reset to defaults</button></h2>
+    <h2>Live Updates <button class="btn" style="float:right" onclick="resetLaunchFeed()">Reset to defaults</button></h2>
     <div id="launchFeed"></div>
   </div>
 </div>
@@ -900,12 +934,12 @@ const PGN_TIP={rathma:"CDR is king — max Cooldown Reduction in Offense.",masq:
 function renderParagon(cId,c,bId){
   const res=RES[cId]||"resource";
   const cats=[
-    ["Core","Movement Speed to 25% (with boots), then <b>"+c.mainStat+"</b>, then Vitality as needed, then Maximum "+res+"."],
-    ["Offense","Critical Hit Damage → Critical Hit Chance → Cooldown Reduction (cap 10%) → Attack Speed."],
-    ["Defense","All Resistance → Life % → Armor → Life Regeneration."],
-    ["Utility","Area Damage → Resource Cost Reduction → Life on Hit → Gold/Globe radius."]
+    ["Core","Movement Speed to 25% (with boots), then <b>"+c.mainStat+"</b>, then Vitality as needed, then Maximum "+res+".","Movement Speed caps at 25% total from gear + paragon combined — extra points beyond that are wasted."],
+    ["Offense","Critical Hit Damage → Critical Hit Chance → Cooldown Reduction (cap 10%) → Attack Speed.","Paragon Cooldown Reduction caps at 10%. Attack Speed and Crit Chance/Damage each cap at 50 paragon points."],
+    ["Defense","All Resistance → Life % → Armor → Life Regeneration.","No hard paragon cap on Defense stats — keep going as needed for survivability."],
+    ["Utility","Area Damage → Resource Cost Reduction → Life on Hit → Gold/Globe radius.","Resource Cost Reduction caps at 50 paragon points."]
   ];
-  document.getElementById('pgnGrid').innerHTML=cats.map(x=>`<div class="pgncat"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("");
+  document.getElementById('pgnGrid').innerHTML=cats.map(x=>`<div class="pgncat"><b>${x[0]} <span class="info" tabindex="0" data-tip="${x[2]}">?</span></b><span>${x[1]}</span></div>`).join("");
   const tier=curTier(),tg=TIER_GUIDANCE[tier];
   document.getElementById('pgnTip').textContent=(PGN_TIP[bId]?('· Tip: '+PGN_TIP[bId]+' '):'')+'· '+tg.paragon;
 }
@@ -945,7 +979,7 @@ function skillRole(text){
 }
 const SHADOW_WORTH={barbarian:"Decent burst filler — none outclass your main rotation, but free damage during the 60s window is still free damage.",crusader:"The Condemn variation hits hardest; all three are safe to just let ride while you keep playing your own build.",demonhunter:"All three lean AoE/burst — worth actively grabbing Shrines/Pylons on packs since DH clones hit well above their own gear.",monk:"Wave of Light variation has the biggest single hits; still a bonus, not a build to build around.",witchdoctor:"Zombie Bears variation is the standout — strong enough that some players path toward Pylons/Shrines just to proc it.",wizard:"Blizzard/Twister variation covers the most ground; all 3 are safe passive value adds.",necromancer:"Bone Spear variation is the cleanest single-target; Corpse Lance covers more area — either is a solid bonus."};
 function renderShadowClones(cId){
-  document.getElementById('shadowIntro').innerHTML='Activating a <b>Shrine or Pylon</b> summons a shadow clone of your class for <b>60 seconds</b>, scaled to your character\'s power. It randomly rolls <b>1 of these 3</b> fixed skill loadouts (no passives, no gear/set bonuses — just base skill + rune). <b>Worth chasing?</b> '+(SHADOW_WORTH[cId]||'');
+  document.getElementById('shadowIntro').innerHTML='A Shrine or Pylon summons a <b>60-second shadow clone</b> of your class, scaled to your power, rolling 1 of these 3 fixed skill loadouts (no passives or gear bonuses). Worth chasing? '+(SHADOW_WORTH[cId]||'');
   const arr=SHADOW_CLONES[cId]||[];
   document.getElementById('shadowClones').innerHTML=arr.map((v,i)=>'<div class="pgncat"><b>Variation '+(i+1)+' — '+v.name+'</b><span>'+v.skills+'</span></div>').join('');
 }
@@ -993,6 +1027,7 @@ function renderTasks(cId,bId,tasks){
   const done=tasks.filter((_,i)=>st[i]).length;
   document.getElementById('gprog').style.width=(done/tasks.length*100)+'%';
   document.getElementById('gprogtxt').textContent=`${done} / ${tasks.length} upgrade steps complete`;
+  document.getElementById('gprogwrap').style.display=done>0?'':'none';
 }
 function renderGuide(){
   const cId=curClassId(),c=CLASSES[cId],bId=curBuildId(cId),b=c.builds[bId];
@@ -1074,6 +1109,7 @@ function renderJourney(){
   host.querySelectorAll(".obj").forEach(el=>{el.onclick=()=>{const s=jnyLoad("journey");s[el.dataset.k]=!s[el.dataset.k];jnySave("journey",s);renderJourney();checkGuardianCelebration()}});
   document.getElementById("jnyprog").style.width=(total?done/total*100:0)+"%";
   document.getElementById("jnyprogtxt").textContent=`${done} / ${total} journey objectives complete`;
+  document.getElementById("jnyprogwrap").style.display=done>0?'':'none';
 }
 /* ---- Guardian celebration: fires once when the Guardian tier's objectives are all checked ---- */
 function checkGuardianCelebration(){
@@ -1113,11 +1149,12 @@ function renderConquests(){
   CONQUESTS.forEach((c,ci)=>{
     const d=!!st[ci];if(d)cd++;const el=document.createElement("div");el.className="task"+(d?" done":"");
     const easy=c.easy?' <span class="pill med">Easy</span>':'';
-    el.innerHTML=`<div class="chk"></div><div><div class="ttitle">${c.n}${easy} <span class="slot">· HC: ${c.hc}</span></div><div class="tdesc">${c.req}</div></div>`;
+    const trio=['On a Good Day','Sprinter','Speed Demon'].includes(c.n)?' <span class="pill trio">Recommended trio</span>':'';
+    el.innerHTML=`<div class="chk"></div><div><div class="ttitle">${c.n}${easy}${trio} <span class="slot">· HC: ${c.hc}</span></div><div class="tdesc">${c.req}</div></div>`;
     el.onclick=()=>{const s=jnyLoad("conquests");s[ci]=!s[ci];jnySave("conquests",s);renderConquests()};
     host.appendChild(el);
   });
-  const cc=document.getElementById("jnycqcount");cc.textContent=`${cd} / 10 done — Conqueror needs 2, Guardian needs 3`;
+  const cc=document.getElementById("jnycqcount");cc.textContent=cd>0?`${cd} / 10 done`:'';
   cc.style.color=cd>=3?"var(--gold2)":(cd>=2?"var(--gold)":"var(--muted)");
 }
 renderJourney();renderConquests();
@@ -1137,7 +1174,7 @@ function renderSetDungeons(){
     el.onclick=()=>{const ss=jnyLoad('setdungeons');ss[i]=!ss[i];jnySave('setdungeons',ss);renderSetDungeons()};
     host.appendChild(el);
   });
-  const cc=document.getElementById('sdcount');cc.textContent=`${done} / 8 needed (${sets.length} total set dungeons tracked)`;
+  const cc=document.getElementById('sdcount');cc.textContent=done>0?`${done} / 8 needed`:'';
   cc.style.color=done>=8?'var(--setc)':'var(--muted)';
 }
 renderSetDungeons();
@@ -1787,6 +1824,7 @@ function closeModal(){document.getElementById('labmodal').classList.remove('open
 function filterOpts(){const q=document.getElementById('modalsearch').value.toLowerCase();[...document.getElementById('modalopts').children].forEach(b=>b.style.display=b.textContent.toLowerCase().includes(q)?'':'none')}
 function renderLab(){
   const P=labPools(LAB.cls);
+  applyTheme(LAB.cls);
   renderPaperdoll();
   document.getElementById('labclassname').textContent=CLASSES[LAB.cls].name+' · '+(LAB.gender==='female'?'Female':'Male');
   // class chips
@@ -1918,7 +1956,12 @@ function closeWelcome(startHere){
 if(!localStorage.getItem('d3master_seen_welcome'))document.getElementById('welcome').classList.add('open');
 
 /* ---- floating help button -> Tools > Glossary ---- */
-function goToGlossary(){goToView('tools');setTimeout(()=>{const g=document.getElementById('glossary');if(g)g.scrollIntoView({behavior:'smooth',block:'start'})},150)}
+function goToGlossary(){goToView('tools');setTimeout(()=>{const item=document.getElementById('glossaryAccItem');if(item){item.classList.add('open');item.scrollIntoView({behavior:'smooth',block:'start'})}},150)}
+/* Accordion: clicking a header toggles its body open/closed (independent, multiple can be open). */
+function toggleAcc(headBtn){
+  if(event&&event.target&&event.target.classList.contains('info'))return; // let info-tooltip clicks not toggle the panel
+  headBtn.closest('.acc-item').classList.toggle('open');
+}
 
 /* ---- SFX (WebAudio ding) ---- */
 let SFX=localStorage.getItem('d3master_sfx')!=='off',_ac;

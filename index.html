@@ -162,7 +162,7 @@
   .paperdoll{display:grid;grid-template-columns:64px 1fr 64px;gap:10px;align-items:start;flex:1 1 320px;min-width:300px}
   .pdcol{display:flex;flex-direction:column;gap:8px}
   .pdfig{display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
-  .pdfig svg{width:100%;max-width:200px;height:auto;filter:drop-shadow(0 6px 16px rgba(0,0,0,.5))}
+  .pdfig svg,.pdfig img{width:100%;max-width:260px;height:auto;filter:drop-shadow(0 8px 22px rgba(0,0,0,.55));border-radius:8px}
   .pdslot{width:64px;height:64px;border:1px solid var(--line);border-radius:8px;background:#120c08;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:.15s}
   .pdslot:hover{border-color:var(--gold)}
   .pdslot.q-orange{border-color:var(--leg)}
@@ -497,7 +497,7 @@
     <div id="azFixFirst"></div>
   </div>
   <div class="card full">
-    <h2>Your Gear <span class="slot">(leave slots blank if unsure — partial input still gives useful results)</span></h2>
+    <h2>Your Gear <span class="info" tabindex="0" data-tip="GOOD (blue/green) = this item matches the build's pick for this slot, and it's Ancient/Primal if that matters here. NEEDS IMPROVEMENT (gold) = right item but not Ancient, or the slot is empty and the build wants something there. WRONG ITEM (red) = this slot has a different item than the one this build calls for.">?</span> <span class="slot">(leave slots blank if unsure — partial input still gives useful results)</span></h2>
     <div id="azRows"></div>
     <div class="grid" style="gap:14px;margin-top:14px">
       <div><label style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)">Main stat (total)</label><input type="number" id="azMain" oninput="renderAnalyzer()" style="width:100%;background:#120c08;border:1px solid var(--line);color:var(--gold2);padding:8px;border-radius:6px"></div>
@@ -1635,8 +1635,11 @@ function pdSlotEl(key){
   el.innerHTML=(it?(ic?'<img src="'+ic+'" alt="">':'<div class="nm">'+it+'</div>'):'<div class="glyph">'+(SLOTLABEL[key]||key)+'</div>')+'<div class="lbl">'+(SLOTLABEL[key]||key)+'</div>';
   el.onclick=()=>pickGear(key,SLOTLABEL[key]||key);return el;
 }
+const PORTRAIT_FILE={barbarian:'barbarian',crusader:'crusader',demonhunter:'demon-hunter',monk:'monk',witchdoctor:'witch-doctor',wizard:'wizard',necromancer:'necromancer'};
+function portraitSrc(cls,gender){return 'portraits/'+(PORTRAIT_FILE[cls]||cls)+'-'+gender+'.svg'}
 function renderPaperdoll(){
-  document.getElementById('labsvg').innerHTML=labFigure(LAB.cls,LAB.gender);
+  const src=portraitSrc(LAB.cls,LAB.gender);
+  document.getElementById('labsvg').innerHTML='<img src="'+src+'" alt="'+CLASSES[LAB.cls].name+' portrait" onerror="this.onerror=null;this.outerHTML=labFigure(\''+LAB.cls+'\',\''+LAB.gender+'\')">';
   const L=document.getElementById('pdleft'),R=document.getElementById('pdright'),B=document.getElementById('pdbottom');
   L.innerHTML='';R.innerHTML='';B.innerHTML='';
   PD_LEFT.forEach(k=>L.appendChild(pdSlotEl(k)));PD_RIGHT.forEach(k=>R.appendChild(pdSlotEl(k)));PD_BOTTOM.forEach(k=>B.appendChild(pdSlotEl(k)));

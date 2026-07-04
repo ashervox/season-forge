@@ -1,0 +1,64 @@
+<svg viewBox="0 0 600 780" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WITCH DOCTOR male class portrait">
+
+  <defs>
+    <radialGradient id="glow-x" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#B06BE0" stop-opacity="0.34"/>
+      <stop offset="55%" stop-color="#B06BE0" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#B06BE0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rim-x" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DDB4F7"/>
+      <stop offset="100%" stop-color="#B06BE0" stop-opacity="0.15"/>
+    </linearGradient>
+    <linearGradient id="vig-x" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="60%" stop-color="#131019" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#08060B" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="soft-x" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <filter id="soft2-x" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+  </defs>
+  <rect width="600" height="780" fill="#131019"/>
+  <rect width="600" height="780" fill="url(#glow-x)"/>
+  <g opacity="0.9"><circle cx="183" cy="102" r="1.6" fill="#B06BE0" opacity="0.23"/>
+    <circle cx="347" cy="291" r="2.6" fill="#B06BE0" opacity="0.48"/>
+    <circle cx="535" cy="109" r="2.2" fill="#B06BE0" opacity="0.19"/>
+    <circle cx="336" cy="144" r="2.6" fill="#B06BE0" opacity="0.38"/>
+    <circle cx="306" cy="138" r="2.1" fill="#B06BE0" opacity="0.25"/>
+    <circle cx="202" cy="482" r="2.0" fill="#B06BE0" opacity="0.34"/>
+    <circle cx="246" cy="590" r="2.2" fill="#B06BE0" opacity="0.28"/>
+    <circle cx="372" cy="263" r="2.5" fill="#B06BE0" opacity="0.36"/>
+    <circle cx="119" cy="207" r="1.8" fill="#B06BE0" opacity="0.32"/>
+    <circle cx="430" cy="341" r="2.6" fill="#B06BE0" opacity="0.33"/>
+    <circle cx="475" cy="296" r="1.7" fill="#B06BE0" opacity="0.57"/>
+    <circle cx="171" cy="419" r="2.4" fill="#B06BE0" opacity="0.19"/>
+    <circle cx="505" cy="598" r="1.1" fill="#B06BE0" opacity="0.49"/>
+    <circle cx="471" cy="217" r="1.3" fill="#B06BE0" opacity="0.24"/>
+    <circle cx="494" cy="342" r="1.4" fill="#B06BE0" opacity="0.21"/>
+    <circle cx="268" cy="515" r="1.6" fill="#B06BE0" opacity="0.18"/></g>
+  <g stroke="#B06BE0" stroke-opacity="0.75" stroke-width="2" fill="#1C1524"><rect x="150" y="120" width="13" height="560" rx="6" transform="rotate(-8 156 400)"/><ellipse cx="176" cy="132" rx="34" ry="42"/><path d="M176 108 q0 -10 8 -16" fill="none" stroke-width="3"/><path d="M150 168 q-20 34 -12 66 M198 166 q22 32 16 66" fill="none" stroke-width="3" stroke-opacity="0.55"/><circle cx="164" cy="126" r="5" fill="#B06BE0" fill-opacity="0.8" stroke="none"/><circle cx="188" cy="126" r="5" fill="#B06BE0" fill-opacity="0.8" stroke="none"/></g><g transform="translate(452,330) rotate(24)" stroke="#B06BE0" stroke-opacity="0.75" stroke-width="2" fill="#1C1524"><path d="M0 -170 C 26 -120, -22 -70, 6 -16 C 26 -60, -14 -110, 8 -168 Z" stroke-width="2.5"/><rect x="-24" y="-18" width="48" height="10" rx="5"/><rect x="-6" y="-10" width="12" height="66" rx="6"/><circle cx="0" cy="64" r="9"/></g>
+  <path d="M78 676 C 88 596, 138 548, 218 528 L 266 512 L 334 512 L 382 528 C 462 548, 512 596, 522 676 Z" fill="#0A070D"/>
+  <rect x="270" y="420" width="60" height="110" fill="#0A070D"/>
+  <ellipse cx="300" cy="346" rx="62" ry="76" fill="#0A070D"/>
+  <path d="M244 250 C 236 388, 250 442, 300 458 C 350 442, 364 388, 356 250 C 336 232, 264 232, 244 250 Z" fill="#0A070D"/><path d="M244 250 C 264 232, 336 232, 356 250" fill="none" stroke="url(#rim-x)" stroke-width="4" opacity="0.9"/><ellipse cx="274" cy="330" rx="16" ry="22" fill="#050308"/><ellipse cx="326" cy="330" rx="16" ry="22" fill="#050308"/><path d="M282 408 q18 14 36 0" fill="none" stroke="#B06BE0" stroke-width="4" opacity="0.8"/><line x1="300" y1="252" x2="300" y2="300" stroke="#B06BE0" stroke-width="3" opacity="0.7"/><path d="M258 252 C 244 210, 236 178, 244 148 C 262 180, 268 214, 272 246 Z" fill="#0A070D"/><path d="M300 244 C 296 200, 298 164, 310 134 C 320 168, 316 208, 310 244 Z" fill="#0A070D"/><path d="M342 252 C 356 210, 364 178, 356 148 C 338 180, 332 214, 328 246 Z" fill="#0A070D"/><path d="M250 220 l14 6 M304 190 l10 4 M352 220 l-14 6" stroke="#B06BE0" stroke-width="3" opacity="0.6"/><path d="M244 548 C 268 592, 332 592, 356 548" fill="none" stroke="#B06BE0" stroke-opacity="0.6" stroke-width="3"/><path d="M270 574 l-5 18 10 0 Z M300 582 l-5 18 10 0 Z M330 574 l-5 18 10 0 Z" fill="#B06BE0" opacity="0.7"/><g filter="url(#soft-x)"><circle cx="274" cy="330" r="6" fill="#DDB4F7"/><circle cx="326" cy="330" r="6" fill="#DDB4F7"/></g>
+
+  <path d="M310 272 A 62 76 0 0 1 362 350 A 62 76 0 0 1 344 402" fill="none" stroke="url(#rim-x)" stroke-width="4" stroke-linecap="round" opacity="0.9"/><path d="M382 530 C 452 550, 498 592, 510 660" fill="none" stroke="url(#rim-x)" stroke-width="3.5" stroke-linecap="round" opacity="0.65"/>
+  <rect width="600" height="780" fill="url(#vig-x)"/>
+
+  <rect x="16" y="16" width="568" height="748" fill="none" stroke="#B06BE0" stroke-opacity="0.45" stroke-width="1.5"/>
+  <rect x="24" y="24" width="552" height="732" fill="none" stroke="#D8CBB0" stroke-opacity="0.14" stroke-width="1"/>
+  <path d="M16 60 L16 16 L60 16" fill="none" stroke="#B06BE0" stroke-width="3.5"/>
+  <path d="M540 16 L584 16 L584 60" fill="none" stroke="#B06BE0" stroke-width="3.5"/>
+  <path d="M16 720 L16 764 L60 764" fill="none" stroke="#B06BE0" stroke-width="3.5"/>
+  <path d="M540 764 L584 764 L584 720" fill="none" stroke="#B06BE0" stroke-width="3.5"/>
+  <path d="M300 16 l14 10 -14 10 -14 -10 Z" fill="#B06BE0" opacity="0.9"/>
+
+  <line x1="120" y1="676" x2="480" y2="676" stroke="#B06BE0" stroke-opacity="0.5" stroke-width="1"/>
+  <text x="300" y="716" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+        font-size="30" letter-spacing="7" fill="#D8CBB0">WITCH DOCTOR</text>
+  <text x="300" y="744" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+        font-size="13" letter-spacing="5" fill="#B06BE0" opacity="0.85">MALE</text>
+</svg>

@@ -1,0 +1,64 @@
+<svg viewBox="0 0 600 780" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WITCH DOCTOR female class portrait">
+
+  <defs>
+    <radialGradient id="glow-x" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#B06BE0" stop-opacity="0.34"/>
+      <stop offset="55%" stop-color="#B06BE0" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#B06BE0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rim-x" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#DDB4F7"/>
+      <stop offset="100%" stop-color="#B06BE0" stop-opacity="0.15"/>
+    </linearGradient>
+    <linearGradient id="vig-x" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="60%" stop-color="#131019" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#08060B" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="soft-x" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <filter id="soft2-x" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+  </defs>
+  <rect width="600" height="780" fill="#131019"/>
+  <rect width="600" height="780" fill="url(#glow-x)"/>
+  <g opacity="0.9"><circle cx="465" cy="103" r="2.2" fill="#B06BE0" opacity="0.43"/>
+    <circle cx="150" cy="129" r="2.1" fill="#B06BE0" opacity="0.48"/>
+    <circle cx="432" cy="506" r="2.4" fill="#B06BE0" opacity="0.56"/>
+    <circle cx="413" cy="529" r="1.2" fill="#B06BE0" opacity="0.20"/>
+    <circle cx="224" cy="147" r="1.5" fill="#B06BE0" opacity="0.22"/>
+    <circle cx="482" cy="359" r="1.2" fill="#B06BE0" opacity="0.57"/>
+    <circle cx="60" cy="124" r="2.3" fill="#B06BE0" opacity="0.37"/>
+    <circle cx="97" cy="135" r="2.1" fill="#B06BE0" opacity="0.50"/>
+    <circle cx="354" cy="581" r="2.3" fill="#B06BE0" opacity="0.38"/>
+    <circle cx="267" cy="139" r="1.5" fill="#B06BE0" opacity="0.24"/>
+    <circle cx="77" cy="605" r="1.2" fill="#B06BE0" opacity="0.46"/>
+    <circle cx="517" cy="558" r="1.2" fill="#B06BE0" opacity="0.32"/>
+    <circle cx="172" cy="293" r="1.9" fill="#B06BE0" opacity="0.56"/>
+    <circle cx="310" cy="411" r="1.2" fill="#B06BE0" opacity="0.57"/>
+    <circle cx="487" cy="203" r="2.4" fill="#B06BE0" opacity="0.42"/>
+    <circle cx="84" cy="330" r="2.2" fill="#B06BE0" opacity="0.37"/></g>
+  <g stroke="#B06BE0" stroke-opacity="0.75" stroke-width="2" fill="#1C1524"><rect x="150" y="120" width="13" height="560" rx="6" transform="rotate(-8 156 400)"/><ellipse cx="176" cy="132" rx="34" ry="42"/><path d="M176 108 q0 -10 8 -16" fill="none" stroke-width="3"/><path d="M150 168 q-20 34 -12 66 M198 166 q22 32 16 66" fill="none" stroke-width="3" stroke-opacity="0.55"/><circle cx="164" cy="126" r="5" fill="#B06BE0" fill-opacity="0.8" stroke="none"/><circle cx="188" cy="126" r="5" fill="#B06BE0" fill-opacity="0.8" stroke="none"/></g><g transform="translate(452,330) rotate(24)" stroke="#B06BE0" stroke-opacity="0.75" stroke-width="2" fill="#1C1524"><path d="M0 -170 C 26 -120, -22 -70, 6 -16 C 26 -60, -14 -110, 8 -168 Z" stroke-width="2.5"/><rect x="-24" y="-18" width="48" height="10" rx="5"/><rect x="-6" y="-10" width="12" height="66" rx="6"/><circle cx="0" cy="64" r="9"/></g>
+  <path d="M112 676 C 120 604, 162 556, 232 538 L 274 520 L 326 520 L 368 538 C 438 556, 480 604, 488 676 Z" fill="#0A070D"/>
+  <rect x="278" y="424" width="44" height="104" fill="#0A070D"/>
+  <ellipse cx="300" cy="348" rx="55" ry="71" fill="#0A070D"/>
+  <path d="M246 340 C 240 272, 360 272, 354 340 C 344 316, 256 316, 246 340 Z" fill="#0A070D"/><path d="M250 322 L 350 322" stroke="#B06BE0" stroke-width="3" opacity="0.7"/><path d="M262 306 l0 -18 M300 300 l0 -22 M338 306 l0 -18" stroke="#B06BE0" stroke-width="4" opacity="0.7"/><path d="M250 330 C 236 400, 236 470, 248 530 L 264 526 C 254 470, 256 404, 266 348 Z" fill="#0A070D"/><path d="M350 330 C 364 400, 364 470, 352 530 L 336 526 C 346 470, 344 404, 334 348 Z" fill="#0A070D"/><circle cx="256" cy="530" r="7" fill="#B06BE0" opacity="0.75"/><circle cx="344" cy="530" r="7" fill="#B06BE0" opacity="0.75"/><path d="M290 400 l0 16 M310 400 l0 16" stroke="#B06BE0" stroke-width="4" opacity="0.7"/><path d="M244 548 C 268 592, 332 592, 356 548" fill="none" stroke="#B06BE0" stroke-opacity="0.6" stroke-width="3"/><path d="M270 574 l-5 18 10 0 Z M300 582 l-5 18 10 0 Z M330 574 l-5 18 10 0 Z" fill="#B06BE0" opacity="0.7"/>
+  <g filter="url(#soft-x)"><path d="M266 344 q11 -8 22 0 q-11 7 -22 0Z" fill="#DDB4F7"/><path d="M312 344 q11 -8 22 0 q-11 7 -22 0Z" fill="#DDB4F7"/></g><g filter="url(#soft2-x)" opacity="0.5"><circle cx="277" cy="344" r="7" fill="#DDB4F7"/><circle cx="323" cy="344" r="7" fill="#DDB4F7"/></g>
+  <path d="M308 280 A 55 71 0 0 1 355 350 A 55 71 0 0 1 340 398" fill="none" stroke="url(#rim-x)" stroke-width="3.5" stroke-linecap="round" opacity="0.9"/><path d="M368 540 C 428 558, 466 598, 476 660" fill="none" stroke="url(#rim-x)" stroke-width="3" stroke-linecap="round" opacity="0.65"/>
+  <rect width="600" height="780" fill="url(#vig-x)"/>
+
+  <rect x="16" y="16" width="568" height="748" fill="none" stroke="#B06BE0" stroke-opacity="0.45" stroke-width="1.5"/>
+  <rect x="24" y="24" width="552" height="732" fill="none" stroke="#D8CBB0" stroke-opacity="0.14" stroke-width="1"/>
+  <path d="M16 60 L16 16 L60 16" fill="none" stroke="#B06BE0" stroke-width="3.5"/>
+  <path d="M540 16 L584 16 L584 60" fill="none" stroke="#B06BE0" stroke-width="3.5"/>
+  <path d="M16 720 L16 764 L60 764" fill="none" stroke="#B06BE0" stroke-width="3.5"/>
+  <path d="M540 764 L584 764 L584 720" fill="none" stroke="#B06BE0" stroke-width="3.5"/>
+  <path d="M300 16 l14 10 -14 10 -14 -10 Z" fill="#B06BE0" opacity="0.9"/>
+
+  <line x1="120" y1="676" x2="480" y2="676" stroke="#B06BE0" stroke-opacity="0.5" stroke-width="1"/>
+  <text x="300" y="716" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+        font-size="30" letter-spacing="7" fill="#D8CBB0">WITCH DOCTOR</text>
+  <text x="300" y="744" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+        font-size="13" letter-spacing="5" fill="#B06BE0" opacity="0.85">FEMALE</text>
+</svg>

@@ -1,0 +1,64 @@
+<svg viewBox="0 0 600 780" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DEMON HUNTER female class portrait">
+
+  <defs>
+    <radialGradient id="glow-x" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#3FB8A8" stop-opacity="0.34"/>
+      <stop offset="55%" stop-color="#3FB8A8" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#3FB8A8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rim-x" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8FE8DC"/>
+      <stop offset="100%" stop-color="#3FB8A8" stop-opacity="0.15"/>
+    </linearGradient>
+    <linearGradient id="vig-x" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="60%" stop-color="#131019" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#08060B" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="soft-x" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <filter id="soft2-x" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+  </defs>
+  <rect width="600" height="780" fill="#131019"/>
+  <rect width="600" height="780" fill="url(#glow-x)"/>
+  <g opacity="0.9"><circle cx="385" cy="344" r="2.4" fill="#3FB8A8" opacity="0.25"/>
+    <circle cx="312" cy="97" r="1.0" fill="#3FB8A8" opacity="0.56"/>
+    <circle cx="72" cy="142" r="1.1" fill="#3FB8A8" opacity="0.22"/>
+    <circle cx="301" cy="341" r="1.5" fill="#3FB8A8" opacity="0.26"/>
+    <circle cx="487" cy="173" r="1.5" fill="#3FB8A8" opacity="0.30"/>
+    <circle cx="393" cy="613" r="1.1" fill="#3FB8A8" opacity="0.36"/>
+    <circle cx="138" cy="245" r="2.4" fill="#3FB8A8" opacity="0.51"/>
+    <circle cx="275" cy="133" r="1.9" fill="#3FB8A8" opacity="0.33"/>
+    <circle cx="421" cy="160" r="2.4" fill="#3FB8A8" opacity="0.33"/>
+    <circle cx="193" cy="203" r="1.5" fill="#3FB8A8" opacity="0.28"/>
+    <circle cx="279" cy="450" r="1.0" fill="#3FB8A8" opacity="0.56"/>
+    <circle cx="77" cy="626" r="1.7" fill="#3FB8A8" opacity="0.33"/>
+    <circle cx="122" cy="564" r="1.1" fill="#3FB8A8" opacity="0.47"/>
+    <circle cx="209" cy="100" r="1.1" fill="#3FB8A8" opacity="0.48"/>
+    <circle cx="245" cy="234" r="2.0" fill="#3FB8A8" opacity="0.22"/>
+    <circle cx="530" cy="151" r="1.5" fill="#3FB8A8" opacity="0.42"/></g>
+  <g transform="translate(160,260) rotate(-30)"><g stroke="#3FB8A8" stroke-opacity="0.75" stroke-width="2" fill="#1C1524"><rect x="-8" y="-30" width="16" height="200" rx="7"/><path d="M0 -22 C -95 -58, -122 12, -96 66" fill="none" stroke-width="9"/><path d="M0 -22 C 95 -58, 122 12, 96 66" fill="none" stroke-width="9"/><line x1="-96" y1="66" x2="96" y2="66" stroke-width="2.5"/><path d="M0 -60 L 8 -22 L -8 -22 Z" fill="#3FB8A8" fill-opacity="0.8"/></g></g><g transform="translate(440,260) rotate(30)"><g stroke="#3FB8A8" stroke-opacity="0.75" stroke-width="2" fill="#1C1524"><rect x="-8" y="-30" width="16" height="200" rx="7"/><path d="M0 -22 C -95 -58, -122 12, -96 66" fill="none" stroke-width="9"/><path d="M0 -22 C 95 -58, 122 12, 96 66" fill="none" stroke-width="9"/><line x1="-96" y1="66" x2="96" y2="66" stroke-width="2.5"/><path d="M0 -60 L 8 -22 L -8 -22 Z" fill="#3FB8A8" fill-opacity="0.8"/></g></g>
+  <path d="M112 676 C 120 604, 162 556, 232 538 L 274 520 L 326 520 L 368 538 C 438 556, 480 604, 488 676 Z" fill="#0A070D"/>
+  <rect x="278" y="424" width="44" height="104" fill="#0A070D"/>
+  <ellipse cx="300" cy="348" rx="55" ry="71" fill="#0A070D"/>
+  <path d="M228 372 C 210 252, 390 252, 372 372 C 372 322, 350 288, 300 284 C 250 288, 228 322, 228 372 Z" fill="#0A070D"/><path d="M228 372 C 214 268, 386 268, 372 372 L 380 430 C 348 400, 252 400, 220 430 Z" fill="#0A070D"/><path d="M232 356 C 224 272, 376 272, 368 356" fill="none" stroke="url(#rim-x)" stroke-width="3.5" opacity="0.85"/><path d="M254 352 C 260 320, 340 320, 346 352 C 340 386, 260 386, 254 352 Z" fill="#050308"/><path d="M104 668 L 122 620 L 134 652 L 150 604 L 162 644 L 178 600 L 190 640 L 206 660 L 104 668 Z" fill="#0A070D"/><path d="M496 668 L 478 620 L 466 652 L 450 604 L 438 644 L 422 600 L 410 640 L 394 660 L 496 668 Z" fill="#0A070D"/><path d="M226 540 L 380 648" stroke="#3FB8A8" stroke-width="6" opacity="0.55"/><path d="M258 396 C 250 440, 256 470, 248 500 L 264 500 C 270 468, 266 436, 272 404 Z" fill="#0A070D"/>
+  <g filter="url(#soft-x)"><path d="M266 344 q11 -8 22 0 q-11 7 -22 0Z" fill="#8FE8DC"/><path d="M312 344 q11 -8 22 0 q-11 7 -22 0Z" fill="#8FE8DC"/></g><g filter="url(#soft2-x)" opacity="0.5"><circle cx="277" cy="344" r="7" fill="#8FE8DC"/><circle cx="323" cy="344" r="7" fill="#8FE8DC"/></g>
+  <path d="M308 280 A 55 71 0 0 1 355 350 A 55 71 0 0 1 340 398" fill="none" stroke="url(#rim-x)" stroke-width="3.5" stroke-linecap="round" opacity="0.9"/><path d="M368 540 C 428 558, 466 598, 476 660" fill="none" stroke="url(#rim-x)" stroke-width="3" stroke-linecap="round" opacity="0.65"/>
+  <rect width="600" height="780" fill="url(#vig-x)"/>
+
+  <rect x="16" y="16" width="568" height="748" fill="none" stroke="#3FB8A8" stroke-opacity="0.45" stroke-width="1.5"/>
+  <rect x="24" y="24" width="552" height="732" fill="none" stroke="#D8CBB0" stroke-opacity="0.14" stroke-width="1"/>
+  <path d="M16 60 L16 16 L60 16" fill="none" stroke="#3FB8A8" stroke-width="3.5"/>
+  <path d="M540 16 L584 16 L584 60" fill="none" stroke="#3FB8A8" stroke-width="3.5"/>
+  <path d="M16 720 L16 764 L60 764" fill="none" stroke="#3FB8A8" stroke-width="3.5"/>
+  <path d="M540 764 L584 764 L584 720" fill="none" stroke="#3FB8A8" stroke-width="3.5"/>
+  <path d="M300 16 l14 10 -14 10 -14 -10 Z" fill="#3FB8A8" opacity="0.9"/>
+
+  <line x1="120" y1="676" x2="480" y2="676" stroke="#3FB8A8" stroke-opacity="0.5" stroke-width="1"/>
+  <text x="300" y="716" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+        font-size="30" letter-spacing="7" fill="#D8CBB0">DEMON HUNTER</text>
+  <text x="300" y="744" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+        font-size="13" letter-spacing="5" fill="#3FB8A8" opacity="0.85">FEMALE</text>
+</svg>

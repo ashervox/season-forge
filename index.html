@@ -510,8 +510,20 @@
     <div class="tdesc" style="margin-bottom:10px">⚠ Seeded automatically (free-set builds ranked A, others B) — reorder/re-tier as real meta data comes in during the first week.</div>
     <div id="launchTierList"></div>
   </div>
+  <div class="card full" style="margin-bottom:14px">
+    <h2>➕ Add Update</h2>
+    <div class="tdesc" style="margin-bottom:10px">Fast entry form for launch day — no code editing. Saved right in this browser.</div>
+    <div class="grid" style="gap:10px">
+      <div><label style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)">Title</label><input id="leTitle" placeholder="e.g. Hotfix: Necromancer bug" style="width:100%;background:#120c08;border:1px solid var(--line);color:var(--gold2);padding:8px;border-radius:6px"></div>
+      <div><label style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)">Date</label><input id="leDate" type="date" style="width:100%;background:#120c08;border:1px solid var(--line);color:var(--gold2);padding:8px;border-radius:6px"></div>
+    </div>
+    <div style="margin-top:10px"><label style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)">Body</label>
+      <textarea id="leBody" placeholder="What happened…" style="width:100%;min-height:70px;background:#120c08;border:1px solid var(--line);color:var(--txt);padding:8px;border-radius:6px;font-family:inherit"></textarea></div>
+    <div style="margin-top:10px"><label style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)">Tags</label><div class="chiprow" id="leTags"></div></div>
+    <button class="bigcta" style="padding:9px 20px;font-size:13px;margin-top:12px" onclick="addLaunchEntry()">📌 Post Update</button>
+  </div>
   <div class="card full">
-    <h2>🔴 Live Updates</h2>
+    <h2>🔴 Live Updates <button class="btn" style="float:right" onclick="resetLaunchFeed()">Reset to defaults</button></h2>
     <div id="launchFeed"></div>
   </div>
 </div>
@@ -560,7 +572,20 @@ const CUBE4_DEFAULT={barbarian:["Nemesis Bracers","free extra elite pack = more 
  witchdoctor:["Nemesis Bracers","free extra elite pack feeds pet/DoT builds well"],
  wizard:["Obsidian Ring of the Zodiac","extra CDR helps most Wizard cooldown-reliant rotations"],
  necromancer:["Focus & Restraint","free damage/toughness pair — safe default across Necro builds"]};
-function cube4For(cId,bId){return CUBE4[cId+'/'+bId]||CUBE4_DEFAULT[cId]}
+/* Build-aware fallback: reads each build's own (already-sourced) .how/.tag text to pick something
+   that actually fits its playstyle, instead of one flat per-class default. Still a heuristic —
+   not individually re-verified against a guide for each of the 51 builds without a hand-tuned
+   CUBE4 entry — but it's reasoning grounded in that build's real description, not a guess in the dark. */
+function autoCube4(cId,bId,b){
+  const text=((b.how||'')+' '+(b.tag||'')).toLowerCase();
+  if(b.lod)return["Focus & Restraint","LoD builds already run 13 Legendaries for the gem's multiplier — a free damage/toughness pair (not a Legendary Power you'd need a 14th item for) is the safest add without disrupting that count."];
+  if(/cooldown|cdr\b/.test(text))return["Obsidian Ring of the Zodiac","this build's own description leans on Cooldown Reduction — extra CDR keeps its key skill(s) up more often."];
+  if(/minion|pet|command skeleton|army of the dead|gargantuan|hydra|zombie|skeletal mage/.test(text))return["Nemesis Bracers","summons a bonus elite pack on kill — great fodder for a pet/minion-focused build like this one."];
+  if(/speed|farm|fast|mobile|movement/.test(text))return["Focus & Restraint","a free damage/toughness pair that doesn't cost a ring slot — useful when speed-farming rings (like Avarice Band) are already claimed."];
+  if(/tank|toughness|durable|thorns|survivab/.test(text))return["Esoteric Alteration","extra flat damage reduction when above 50% Life — fits a build that's already built to stay tanky."];
+  return CUBE4_DEFAULT[cId];
+}
+function cube4For(cId,bId){const b=CLASSES[cId].builds[bId];return CUBE4[cId+'/'+bId]||autoCube4(cId,bId,b)}
 
 /* Season 39 theme: Shrine/Pylon spawns a shadow clone of your class (60s, scaled to you) using 1 of 3 fixed skill-only loadouts (no passives/gear). Data = Season 22 rerun (identical mechanic). */
 const SHADOW_CLONES={
@@ -1266,14 +1291,54 @@ const LIVEBLOG_ENTRIES=[
  {date:"2026-06-26",title:"Season 39 is live",body:"Shades of the Nephalem has returned (rerun of the Season 22 theme: bonus Cube slot + Shadow Clones). Haedrig's Gift sets and starter builds are in the Build Guide tab.",tags:["Launch"]},
  {date:"2026-06-24",title:"Season 39 preview posted",body:"Blizzard confirmed the theme and start time ahead of launch.",tags:["Announcement"]},
 ];
+function glanceKey(){return 'd3master_glance_overlay'}
+function glanceData(){let ov;try{ov=JSON.parse(localStorage.getItem(glanceKey()))}catch(e){}return Object.assign({},SEASON_GLANCE,ov||{})}
+let _glanceEditing=false;
 function renderLaunchGlance(){
-  const rows=[["Season","39 — "+SEASON_GLANCE.theme],["Starts",SEASON_GLANCE.start],["Mechanic",SEASON_GLANCE.mechanic],["Haedrig's Gift sets",SEASON_GLANCE.haedrig],["Rewards",SEASON_GLANCE.rewards]];
-  document.getElementById('launchGlance').innerHTML=rows.map(r=>'<div class="pgncat"><b>'+r[0]+'</b><span>'+r[1]+'</span></div>').join('');
-  document.getElementById('launchUpdated').innerHTML='Last updated: <b>'+(LIVEBLOG_ENTRIES[0]?LIVEBLOG_ENTRIES[0].date:'—')+'</b> · this page is a hand-updated feed, not auto-refreshing.';
+  const g=glanceData(),host=document.getElementById('launchGlance');
+  if(_glanceEditing){
+    const fields=[['start','Starts'],['mechanic','Mechanic'],['haedrig',"Haedrig's Gift sets"],['rewards','Rewards']];
+    host.innerHTML=fields.map(([k,label])=>`<div><label style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)">${label}</label>
+      <textarea data-gf="${k}" style="width:100%;min-height:44px;background:#120c08;border:1px solid var(--line);color:var(--txt);padding:7px;border-radius:6px;font-family:inherit;font-size:13px">${g[k]}</textarea></div>`).join('')+
+      '<button class="btn" style="margin-top:6px" onclick="saveGlanceEdit()">💾 Save</button>';
+  }else{
+    const rows=[["Season","39 — "+g.theme],["Starts",g.start],["Mechanic",g.mechanic],["Haedrig's Gift sets",g.haedrig],["Rewards",g.rewards]];
+    host.innerHTML=rows.map(r=>'<div class="pgncat"><b>'+r[0]+'</b><span>'+r[1]+'</span></div>').join('')+
+      '<button class="btn" onclick="toggleGlanceEdit()">✏ Edit these fields</button>';
+  }
+  document.getElementById('launchUpdated').innerHTML='Last updated: <b>'+(allLaunchEntries()[0]?allLaunchEntries()[0].date:'—')+'</b> · this page is a hand-updated feed, not auto-refreshing.';
 }
+function toggleGlanceEdit(){_glanceEditing=true;renderLaunchGlance()}
+function saveGlanceEdit(){
+  const ov={};document.querySelectorAll('#launchGlance textarea[data-gf]').forEach(t=>ov[t.dataset.gf]=t.value);
+  localStorage.setItem(glanceKey(),JSON.stringify(ov));_glanceEditing=false;renderLaunchGlance();
+}
+function feedKey(){return 'd3master_launch_entries'}
+function userEntries(){try{return JSON.parse(localStorage.getItem(feedKey()))||[]}catch(e){return []}}
+function allLaunchEntries(){return userEntries().concat(LIVEBLOG_ENTRIES).sort((a,b)=>(b.date||'').localeCompare(a.date||''))}
+const LE_TAG_OPTIONS=['Patch Notes','Balance','Bug','Hotfix','Announcement'];
+let _leSelectedTags=[];
+function renderLeTags(){
+  document.getElementById('leTags').innerHTML=LE_TAG_OPTIONS.map(t=>`<button type="button" class="chip${_leSelectedTags.includes(t)?' active':''}" onclick="toggleLeTag('${t}')">${t}</button>`).join('');
+}
+function toggleLeTag(t){const i=_leSelectedTags.indexOf(t);if(i>=0)_leSelectedTags.splice(i,1);else _leSelectedTags.push(t);renderLeTags()}
+function addLaunchEntry(){
+  const title=document.getElementById('leTitle').value.trim(),body=document.getElementById('leBody').value.trim();
+  const date=document.getElementById('leDate').value||new Date().toISOString().slice(0,10);
+  if(!title){alert('Give the update a title first.');return}
+  const entries=userEntries();entries.push({id:Date.now(),date,title,body,tags:[..._leSelectedTags]});
+  localStorage.setItem(feedKey(),JSON.stringify(entries));
+  document.getElementById('leTitle').value='';document.getElementById('leBody').value='';document.getElementById('leDate').value='';_leSelectedTags=[];renderLeTags();
+  renderLaunchFeed();renderLaunchGlance();
+}
+function deleteLaunchEntry(id){
+  const entries=userEntries().filter(e=>e.id!==id);localStorage.setItem(feedKey(),JSON.stringify(entries));renderLaunchFeed();renderLaunchGlance();
+}
+function resetLaunchFeed(){if(confirm('Remove all your added updates? (Seed entries stay.)')){localStorage.removeItem(feedKey());renderLaunchFeed();renderLaunchGlance()}}
 function renderLaunchFeed(){
-  document.getElementById('launchFeed').innerHTML=LIVEBLOG_ENTRIES.map(e=>
-   `<div class="task" style="cursor:default"><div><div class="ttitle">${e.title} <span class="slot">· ${e.date}</span> ${(e.tags||[]).map(t=>'<span class="pill med">'+t+'</span>').join(' ')}</div><div class="tdesc">${e.body}</div></div></div>`
+  document.getElementById('launchFeed').innerHTML=allLaunchEntries().map(e=>
+   `<div class="task" style="cursor:default"><div style="flex:1"><div class="ttitle">${e.title} <span class="slot">· ${e.date}</span> ${(e.tags||[]).map(t=>'<span class="pill med">'+t+'</span>').join(' ')}</div><div class="tdesc">${e.body||''}</div></div>`+
+   (e.id?`<button class="btn" style="padding:3px 8px" onclick="deleteLaunchEntry(${e.id})">✕</button>`:'')+`</div>`
   ).join('');
 }
 function tierKey(){return 'd3master_tierlist'}
@@ -1313,7 +1378,7 @@ function initLaunch(){
   document.title='Diablo 3 Season 39: '+SEASON_GLANCE.theme+' — Start Time, Patch Notes, Best Builds | Season Forge';
   let m=document.querySelector('meta[name="description"]');if(!m){m=document.createElement('meta');m.name='description';document.head.appendChild(m)}
   m.content='Diablo 3 Season 39 ('+SEASON_GLANCE.theme+') start time, live patch notes, and the best builds per class — updated as the season unfolds.';
-  renderLaunchGlance();renderLaunchFeed();renderLaunchTierList();
+  renderLaunchGlance();renderLaunchFeed();renderLaunchTierList();renderLeTags();
 }
 
 function renderStartHere(){

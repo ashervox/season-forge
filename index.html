@@ -87,9 +87,11 @@
   .chip:hover{color:var(--gold);border-color:var(--gold)}
   .chip.active{background:var(--gold);color:#1a1006;border-color:var(--gold);font-weight:700}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid>*{min-width:0}
   @media(max-width:780px){.grid{grid-template-columns:1fr}.bigsel{min-width:160px}}
   .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:10px;padding:18px 20px;box-shadow:0 6px 22px rgba(0,0,0,.4)}
-  .card h2{margin:0 0 14px;font-size:15px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--line);padding-bottom:9px;display:flex;align-items:center;gap:8px}
+  .card h2{margin:0 0 14px;font-size:15px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--line);padding-bottom:9px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .card h2>*{min-width:0}
   .stat-row{display:flex;justify-content:space-between;padding:5px 0;font-size:14px;border-bottom:1px dashed rgba(58,42,30,.5)}
   .stat-row span:last-child{color:var(--gold2);font-weight:600;text-align:right}
   .gear{margin:0;padding:0}
@@ -111,10 +113,12 @@
   .pill.prio{background:rgba(176,48,31,.25);color:var(--red2);border:1px solid var(--red)}
   .pill.med{background:rgba(90,127,176,.2);color:var(--blue);border:1px solid var(--blue)}
   .pill.trio{background:rgba(201,162,75,.22);color:var(--gold2);border:1px solid var(--gold)}
-  .rowlabel{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:4px 0 12px;display:flex;align-items:center;gap:6px}
+  .rowlabel{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:4px 0 12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .rowlabel>*{min-width:0}
   .accordion{display:flex;flex-direction:column;gap:10px}
   .acc-item{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .acc-head{width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--gold);font-size:15px;letter-spacing:1px;text-transform:uppercase;font-weight:700;padding:16px 18px;cursor:pointer;text-align:left;font-family:inherit}
+  .acc-head{width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--gold);font-size:15px;letter-spacing:1px;text-transform:uppercase;font-weight:700;padding:16px 18px;cursor:pointer;text-align:left;font-family:inherit;flex-wrap:wrap}
+  .acc-head>*{min-width:0}
   .acc-head:hover{color:var(--gold2)}
   .acc-head span:first-child{flex:1}
   .acc-chevron{font-size:13px;color:var(--muted);transition:transform .2s}
@@ -152,6 +156,12 @@
   .icobtn::after{content:attr(data-tip);position:absolute;bottom:130%;left:50%;transform:translateX(-50%);width:180px;background:#12100c;border:1px solid var(--gold);color:var(--txt);font-size:11.5px;font-weight:400;line-height:1.4;padding:7px 9px;border-radius:7px;box-shadow:0 8px 20px rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:opacity .15s;z-index:30;text-align:center;pointer-events:none}
   .icobtn:hover::after,.icobtn:focus::after{opacity:1;visibility:visible}
   @media(max-width:560px){.labbtns{flex-direction:column;align-items:stretch!important}.icotoolbar{margin-left:0;justify-content:center}}
+  /* Mobile tooltips: anchoring under the icon overflows the screen edge on narrow viewports
+     since icons sit anywhere inline in text. Below this width, detach both tooltip types from
+     the icon and pin them centered near the bottom of the viewport instead — always on-screen. */
+  @media(max-width:700px){
+    .info::after,.icobtn::after{position:fixed;left:50%;right:auto;bottom:18px;top:auto;transform:translateX(-50%);width:88vw;max-width:360px;font-size:13px;box-shadow:0 -4px 32px rgba(0,0,0,.6);z-index:200}
+  }
   /* ===== Build Lab ===== */
   .labtop{display:flex;gap:18px;flex-wrap:wrap;align-items:stretch}
   .labportrait{flex:1 1 300px;min-width:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,var(--tint),var(--panel));border:1px solid var(--line);border-radius:12px;padding:16px}
